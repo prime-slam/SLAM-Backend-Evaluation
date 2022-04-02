@@ -15,8 +15,8 @@ def convert_from_plane_to_3d(u, v, depth, cx, cy, focal_x, focal_y):
 
 
 def main():
-    color_matrix = cv2.imread('annot.png', cv2.IMREAD_COLOR)
-    matrix_depth = cv2.imread('depth.png', cv2.IMREAD_ANYDEPTH)
+    color_matrix = cv2.imread('annot.png')
+    matrix_depth = cv2.imread('depth.png')
 
     print(color_matrix)
 
@@ -28,15 +28,21 @@ def main():
     matrix_v = np.tile(columns_indices, (rows, 1))
     matrix_u = np.transpose(np.tile(np.arange(rows), (columns, 1)))
 
-    x, y, z, = convert_from_plane_to_3d(matrix_u, matrix_v, matrix_depth, cx=319.50, cy=239.50, focal_x=481.20,
-                                        focal_y=-480.00)  # getting xyz coordinates of each point
+    x, y, z, = convert_from_plane_to_3d(
+        matrix_u,
+        matrix_v,
+        matrix_depth,
+        cx=319.50,
+        cy=239.50,
+        focal_x=481.20,
+        focal_y=-480.00
+    )  # getting xyz coordinates of each point
 
     matrix_xyz = np.dstack((x, y, z))
-    answ_matrix = matrix_xyz.reshape(rows * columns, 3)  # now we have a list of points
+    matrix_of_points = matrix_xyz.reshape(rows * columns, 3)  # now we have a list of points
 
     pc = o3d.geometry.PointCloud()
-
-    pc.points = o3d.utility.Vector3dVector(answ_matrix)
+    pc.points = o3d.utility.Vector3dVector(matrix_of_points )
     pc.colors = o3d.utility.Vector3dVector(color_matrix_flattened.astype(np.float64) / 255.0)
 
     if pc.has_colors():
