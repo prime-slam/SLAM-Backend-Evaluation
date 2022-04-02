@@ -4,8 +4,8 @@ import open3d as o3d
 
 
 def convert_from_plane_to_3d(u, v, depth, cx, cy, focal_x, focal_y):
-    x_over_z = (cx - u) * 1 / focal_x
-    y_over_z = (cy - v) * 1 / focal_y
+    x_over_z = (cx - u) / focal_x
+    y_over_z = (cy - v) / focal_y
 
     z_matrix = depth / 5000
 
@@ -37,7 +37,6 @@ def main():
     pc = o3d.geometry.PointCloud()
 
     pc.points = o3d.utility.Vector3dVector(answ_matrix)
-    points = np.asarray(pc.points)
     pc.colors = o3d.utility.Vector3dVector(color_matrix_flattened.astype(np.float64) / 255.0)
 
     if pc.has_colors():
