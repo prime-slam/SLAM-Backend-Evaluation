@@ -18,17 +18,19 @@ def convert_from_plane_to_3d(u, v, depth, cx, cy, focal_x, focal_y):
 def get_normal(points):
     c = np.mean(points, axis=0)
     A = np.array(points) - c
-    U, S, VT = np.linalg.svd(A)
-    n = VT[2]
+    # U, S, VT = np.linalg.svd(A)
+    eigvals, eigvects = np.linalg.eig(A.T@A)
+    min_index = np.argmin(eigvals)
+    n = eigvects[:,min_index]
     print(n)
     return n[0], n[1], n[2], np.dot(n, c)
 
 
 def main():
-    color_matrix = cv2.imread('annot.png')
-    matrix_depth = cv2.imread('depth.png')
+    color_matrix = cv2.imread('annot.png', cv2.IMREAD_COLOR)
+    matrix_depth = cv2.imread('depth.png', cv2.IMREAD_ANYDEPTH)
 
-    rows, columns, channels = color_matrix.shape
+    rows, columns, _ = color_matrix.shape
 
     columns_indices = np.arange(columns)
 
@@ -60,15 +62,11 @@ def main():
 
     num_of_points, _ = reshaped_color_matrix.shape
 
-    unique_colors_without_black = filter(lambda x: x != [0, 0, 0], colors)
+    unique_colors_without_black = filter(lambda x: (x != [0, 0, 0]).all(axis=0), colors_unique)
 
     for i, color in enumerate(unique_colors_without_black):
-        plane_points = []
-
         indices = np.where((reshaped_color_matrix == color).all(axis=1))
-
-        for index in indices[0]:
-            plane_points.append(matrix_of_points[index])
+        plane_points = matrix_of_points[indices[0]]
 
         plane_points_array = np.array(plane_points)
         equations.append(np.array(get_normal(plane_points_array)))  # getting equation out of plane
