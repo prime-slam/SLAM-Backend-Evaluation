@@ -21,9 +21,9 @@ def get_normal(points):
     # U, S, VT = np.linalg.svd(A)
     eigvals, eigvects = np.linalg.eig(A.T@A)
     min_index = np.argmin(eigvals)
-    n = eigvects[:,min_index]
+    n = eigvects[:, min_index]
     print(n)
-    return n[0], n[1], n[2], np.dot(n, c)
+    return np.array([0], n[1], n[2], np.dot(n, c))
 
 
 def main():
@@ -69,7 +69,7 @@ def main():
         plane_points = matrix_of_points[indices[0]]
 
         plane_points_array = np.array(plane_points)
-        equations.append(np.array(get_normal(plane_points_array)))  # getting equation out of plane
+        equations.append(get_normal(plane_points_array))  # getting equation out of plane
 
         normals = np.asarray(pc.normals)
         normals[np.asarray(indices)] =  10 * equations[i][:-1]
