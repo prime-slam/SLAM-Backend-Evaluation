@@ -1,3 +1,3 @@
-# PointCloudsAndStuff
+# SLAMBackendAlgos
 
 A Project for benchmarking existing SLAM algorithms on planes dataset
