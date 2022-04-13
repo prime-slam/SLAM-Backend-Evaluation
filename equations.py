@@ -18,12 +18,11 @@ def convert_from_plane_to_3d(u, v, depth, cx, cy, focal_x, focal_y):
 def get_normal(points):
     c = np.mean(points, axis=0)
     A = np.array(points) - c
-    # U, S, VT = np.linalg.svd(A)
     eigvals, eigvects = np.linalg.eig(A.T@A)
     min_index = np.argmin(eigvals)
     n = eigvects[:, min_index]
-    print(n)
-    return np.array([0], n[1], n[2], np.dot(n, c))
+    answ = np.asarray([n[0], n[1], n[2], -np.dot(n, c)])
+    return answ
 
 
 def main():
