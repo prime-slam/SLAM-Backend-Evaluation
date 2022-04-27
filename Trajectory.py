@@ -8,17 +8,16 @@ from mrob.mrob import FGraph, geometry, registration, LM
 
 
 def image_processing(path_color, path_depth):
-    color_matrix = cv2.imread(path_color, cv2.IMREAD_COLOR)
+    matrix_color = cv2.imread(path_color, cv2.IMREAD_COLOR)
     matrix_depth = cv2.imread(path_depth, cv2.IMREAD_ANYDEPTH)
 
-    rows, columns, _ = color_matrix.shape
-
+    rows, columns, _ = matrix_color.shape
     columns_indices = np.arange(columns)
 
     matrix_v = np.tile(columns_indices, (rows, 1))
     matrix_u = np.transpose(np.tile(np.arange(rows), (columns, 1)))
 
-    camera_intrinsics = plane_extraction.Camera(cx=319.50, cy=239.50, focal_x=481.20, focal_y=-480.00)
+    camera_intrinsics = plane_extraction.Camera(cx=319.50, cy=239.50, focal_x=481.20, focal_y=-480.00, scale=5000)
 
     matrix_xyz = plane_extraction.convert_from_plane_to_3d(
         matrix_u,
@@ -28,47 +27,45 @@ def image_processing(path_color, path_depth):
     )  # getting xyz coordinates of each point
 
     matrix_of_points = matrix_xyz.reshape(-1, matrix_xyz.shape[2])  # now we have a list of points
-    reshaped_color_matrix = color_matrix.reshape(-1,
-                                                 color_matrix.shape[2])  # reshape matrix in order to get unique colors
+    reshaped_color_matrix = matrix_color.reshape(-1, matrix_color.shape[2])  # reshape matrix in order to get unique colors
     return matrix_of_points, reshaped_color_matrix
 
 
-def main():
+def read_gt(path):
+    all_lines = []
 
-    planes_matcher = {}  # map (color: index)
-    path_depth = "depth/200/"
-    path_color = "markup/200/"
+    in_file = open(path).read().splitlines()  # getting gt data
+    for line in in_file:
+        if line != '':
+            all_lines.append(line)
 
-    depths = sorted(os.listdir(path_depth), key=lambda x: int(x.replace(".png", "")))
-    pahlava = sorted(os.listdir(path_color),   key=lambda x: int(x.replace(".png", "")))
+    array_with_lines = np.loadtxt(all_lines)
+    gt_matrices = np.split(array_with_lines, len(os.listdir()), axis=0)
+    return gt_matrices
 
-    num_of_nodes = len(depths)
 
-    depth_annot = []
-    for i in range(len(depths)):
-        depth_annot.append(["markup/200/" + pahlava[i], "depth/200/" + depths[i]])
+def measuring_error(num_of_nodes, graph_estimated_state):
 
-    equations = []
-    matrices_of_points = []
-    colors = []
+    gt_matrices = read_gt('gt.txt')
+    gt_matrix_the_last = gt_matrices[num_of_nodes-1]  # measuring error only by the last matrix
+    gt_matrix_01 = gt_matrices[0]
 
-    for image, depth in depth_annot:
-        points_of_image, colors_of_image = image_processing(image, depth)
-        equations_of_image = plane_extraction.equation_extraction(points_of_image, colors_of_image, planes_matcher)
+    T_gt_the_last = np.append(gt_matrix_the_last, [[0, 0, 0, 1]], axis=0)
+    T_gt_01 = np.append(gt_matrix_01, [[0, 0, 0, 1]], axis=0)
 
-        matrices_of_points.append(points_of_image)
-        colors.append(colors_of_image)
-        equations.append(equations_of_image)
+    T1 = geometry.SE3(graph_estimated_state[-1])
 
-    point_clouds = []
+    absolute_gt = np.linalg.inv(T_gt_01) @ T_gt_the_last
 
-    for i in range(num_of_nodes):
-        pc = o3d.geometry.PointCloud()
-        pc.points = o3d.utility.Vector3dVector(matrices_of_points[i])
-        pc.colors = o3d.utility.Vector3dVector(colors[i].astype(np.float64) / 255.0)
-        point_clouds.append(pc)
-        # pc_2.normals = o3d.utility.Vector3dVector(np.zeros_like(matrix_of_points_2))
+    T_gt_SE3 = geometry.SE3(absolute_gt)
 
+    error_rotation = T1.distance_rotation(T_gt_SE3)
+    error_translation = T1.distance_trans(T_gt_SE3)
+
+    return error_rotation, error_translation
+
+
+def work_with_graph(num_of_nodes, equations):
     graph = FGraph()
     set_indx = set()
 
@@ -87,61 +84,94 @@ def main():
         graph_trajectory.append(next_node)
     graph.add_factor_1pose_3d(geometry.SE3(), graph_trajectory[0], 1e6 * np.identity(6))
 
+    map_index_of_plane_real_index = {}
+    for i in range(num_of_nodes):
+        real_indx = len(map_index_of_plane_real_index)
+        for _, index in equations[i]:
+            if index not in map_index_of_plane_real_index:
+                map_index_of_plane_real_index[index] = real_indx
+                real_indx += 1
+
     for n in range(num_of_nodes):
         for equation in equations[n]:
-            graph.add_factor_1pose_1plane_4d(equation[0], graph_trajectory[n], equation[1], W_z)
+            cur_indx = map_index_of_plane_real_index[equation[1]]
+            graph.add_factor_1pose_1plane_4d(equation[0], graph_trajectory[n], cur_indx, W_z)
 
     graph.solve(LM)
-    x = graph.get_estimated_state()
+    graph_estimated_state = graph.get_estimated_state()
 
-    all_lines = []
+    error_rotation, error_translation = measuring_error(num_of_nodes, graph_estimated_state)
 
-    in_file = open('gt.txt').read().splitlines()
-    for line in in_file:
-        if line != '':
-            all_lines.append(line)
+    return graph_estimated_state
 
-    array_with_lines = np.loadtxt(all_lines)
-    gt_matrices = np.split(array_with_lines, 1508, axis=0)
+def main():
 
-    gt_translation_0 = [[0, 0, -2.25]]
-    q_0 = [0, 0, 0, 1]
+    path_depth = "depth/50-100/"
+    path_color = "markup/50-100/"
 
-    gt_matrix_200 = gt_matrices[199]
-    gt_matrix_01 = gt_matrices[0]
+    depths = sorted(os.listdir(path_depth), key=lambda x: int(x[:-4]))
+    pahlava = sorted(os.listdir(path_color), key=lambda x: int(x[:-4]))
+
+    num_of_nodes = len(depths)
+
+    depth_annot = []
+    for i, _ in enumerate(depths):
+        depth_annot.append((["markup/50-100/" + pahlava[i], "depth/50-100/" + depths[i]]))
+
+    equations = []
+    matrices_of_points = []
+    colors = []
+    map_indx_points = {}
+
+    for image, depth in depth_annot:
+        points_of_image, colors_of_image = image_processing(image, depth)
+        planes_matcher, map_indx_points = plane_extraction.building_maps(points_of_image, colors_of_image)
+
+    viceversa = {} # and one more map (max_num_points: indx)
+
+    for key, value in map_indx_points.items():
+        viceversa[value] = key
+
+    list_of_max_points = list(map_indx_points.values())
+    ten_max_points = sorted(list_of_max_points)[-10:]
+
+    for points in ten_max_points:
+       ten_max_indices = viceversa[points]
+
+    for image, depth in depth_annot:
+        points_of_image, colors_of_image = image_processing(image, depth)
+        equations_of_image = plane_extraction.equation_extraction(points_of_image, colors_of_image, planes_matcher, ten_max_indices)
+        # we take equations only of 10 maximum planes
+
+        matrices_of_points.append(points_of_image)
+        colors.append(colors_of_image)
+        equations.append(equations_of_image)
+
+    point_clouds = []
+
+    for i in range(num_of_nodes):
+        pc = o3d.geometry.PointCloud()
+        pc.points = o3d.utility.Vector3dVector(matrices_of_points[i])
+        pc.colors = o3d.utility.Vector3dVector(colors[i].astype(np.float64) / 255.0)
+        point_clouds.append(pc)
 
     reflection = np.asarray(
-        [[-1, 0, 0, 0], [0, -1, 0, 0], [0, 0, -1, 0], [0, 0, 0, 1]])
+        [[-1, 0, 0, 0],
+        [0, -1, 0, 0],
+        [0, 0, -1, 0],
+        [0, 0, 0, 1]]
+    )
 
-    T1 = geometry.SE3(x[-1])
-    print("T1")
-    print(T1.T())
-    print()
-
-    T_gt_200 = np.append(gt_matrix_200, [[0, 0, 0, 1]], axis=0)
-    T_gt_01 = np.append(gt_matrix_01, [[0, 0, 0, 1]], axis=0)
-
-    transation_gt = (np.linalg.inv(T_gt_01) @ T_gt_200 - np.linalg.inv(T_gt_01) @ T_gt_200)[:3, 3]
-    print(transation_gt)
+    graph_estimaed_state = work_with_graph(num_of_nodes, equations)
 
     pc_answ = o3d.geometry.PointCloud()
-
     for i, pc in enumerate(reversed(point_clouds)):
-        pc_answ += pc.transform(x[-(i + 1)]).transform(reflection)
+        pc_answ += pc.transform(graph_estimaed_state[-(i + 1)]).transform(reflection)
+    pc_answ = pc_answ.voxel_down_sample(0.01)
 
     o3d.visualization.draw_geometries([pc_answ])
-
-    absolute_gt = np.linalg.inv(T_gt_01) @ T_gt_200
-    print('T_gt * T_gt_0^(-1))')
-    print(absolute_gt)
-    print()
-
-    T_gt_SE3 = geometry.SE3(absolute_gt)
-
-    print(T1.distance_rotation(T_gt_SE3))
-    print('############')
-    print(T1.distance_trans(T_gt_SE3))
 
 
 if __name__ == '__main__':
     main()
+    
