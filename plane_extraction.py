@@ -13,11 +13,17 @@ class Camera(object):
         self.scale = scale
 
 
+class Plane(object):
+    def __init__(self, equation, indx):
+        self.equation = equation
+        self.index = indx
+
+
 def array_to_string(array: np.array) -> str:
-    channels = []
-    for num in array:
-        channels.append(str(num))
+
+    channels = [str(num) for num in array]
     string = "#".join(channels)
+
     return string
 
 
@@ -46,58 +52,43 @@ def get_normal(points):
     return np.asarray([normal[0], normal[1], normal[2], d])
 
 
-def building_maps(points, point_colors):
+def building_maps(points, point_colors, color_to_index, indx_to_max_num_points):
 
-    map_color_index = {}  # map (color: index)
-    map_indx_max_num_points = {}  # map (indx: max_num_points)
     colors_unique = np.unique(point_colors, axis=0)
 
     num_unique_colors, _ = colors_unique.shape
-    equations = []
-
     num_of_points, _ = points.shape
 
     unique_colors_without_black = filter(lambda x: (x != [0, 0, 0]).all(axis=0), colors_unique)
 
-    indx = len(map_color_index)
+    indx = len(color_to_index)
     for color in unique_colors_without_black:
         color_string = array_to_string(color)
-        if color_string not in map_color_index:  # if the plane is new
-            map_color_index[color_string] = indx  # append (color:index) to map with the next index
+        if color_string not in color_to_index:  # if the plane is new
+            color_to_index[color_string] = indx  # append (color:index) to map with the next index
             indx += 1
-
-    unique_colors_without_black = filter(lambda x: (x != [0, 0, 0]).all(axis=0), colors_unique)
-
-    for i, color in enumerate(unique_colors_without_black):
-        color_string = array_to_string(color)
-        cur_indx = map_color_index[color_string]
+        cur_indx = color_to_index[color_string]
         indices = np.where((point_colors == color).all(axis=1))
-        plane_points = points[indices[0]]
-        if (cur_indx in map_indx_max_num_points
-        and len(indices[0]) > map_indx_max_num_points[cur_indx]) or cur_indx not in map_indx_max_num_points:
-            map_indx_max_num_points[cur_indx] = len(indices[0])
+        if (cur_indx in indx_to_max_num_points and len(indices[0]) > indx_to_max_num_points[cur_indx]) \
+                or cur_indx not in indx_to_max_num_points:
+            indx_to_max_num_points[cur_indx] = len(indices[0])
 
-    return map_color_index, map_indx_max_num_points
+    return color_to_index, indx_to_max_num_points
 
 
-def equation_extraction(points, point_colors, map_color_index, max_planes):
+def equation_extraction(points, point_colors, color_to_index, max_planes):
     colors_unique = np.unique(point_colors, axis=0)
 
-    #num_unique_colors, _ = colors_unique.shape
-    equations = []
-
-    #num_of_points, _ = points.shape
-
-    #unique_colors_without_black = filter(lambda x: (x != [0, 0, 0]).all(axis=0), colors_unique)
-
-    unique_colors_without_black = filter(lambda x: (x != [0, 0, 0]).all(axis=0), colors_unique)
+    planes = []
+    unique_colors_without_black = list(filter(lambda x: (x != [0, 0, 0]).all(axis=0), colors_unique))
 
     for color in unique_colors_without_black:
         color_string = array_to_string(color)
-        cur_indx = map_color_index[color_string]
+        cur_indx = color_to_index[color_string]
         indices = np.where((point_colors == color).all(axis=1))
         if cur_indx in max_planes:
             plane_points = points[indices[0]]
-            equations.append((get_normal(plane_points), map_color_index[color_string]))
+            plane = Plane(get_normal(plane_points), color_to_index[color_string])
+            planes.append(plane)
 
-    return equations
+    return planes
