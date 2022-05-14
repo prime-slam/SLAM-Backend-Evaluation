@@ -40,7 +40,7 @@ def rotation_matrix_to_quaternion(r_matrix):
         qx = (r21 - r12) / s
         qy = (r02 - r20) / s
         qz = (r10 - r01) / s
-    elif r00 > r11 & r00 > r22:
+    elif r00 > r11 and r00 > r22:
         s = math.sqrt(1.0 + r00 - r11 - r22) * 2
         qw = (r21 - r12) / s
         qx = 0.25 * s
@@ -159,9 +159,16 @@ def measure_error(first_node, first_gt_node, num_of_nodes, graph_estimated_state
     elif first_gt_node > 0:
         bias_gt = first_gt_node
 
-    for line in in_file_gt[first_node - bias_gt:first_node + num_of_nodes - first_gt_node]:
-        file_to_write_gt.write(line)
+    gt_matrices = read_gt_poses('gt.txt', 1508)
+
+    for i, matrix in enumerate(gt_matrices[first_node - bias_gt:first_node + num_of_nodes - first_gt_node]):
+        data = make_a_string(i + first_node + bias, matrix[:3, 3], rotation_matrix_to_quaternion(matrix[:3, :3]))
+        file_to_write_gt.write(data + '\n')
     file_to_write_gt.close()
+
+    # for line in in_file_gt[first_node - bias_gt:first_node + num_of_nodes - first_gt_node]:
+    #     file_to_write_gt.write(line)
+    # file_to_write_gt.close()
 
     file_to_write_estimated = open(file_name_estimated, 'w')
 
@@ -243,26 +250,40 @@ def visualisation(graph_estimated_state, num_of_nodes, matrices_of_points, color
     o3d.visualization.draw_geometries([pc_answ])
 
 
-def main(path_color, path_orig_color, general_path_orig, general_path):
+def main(path_color, path_orig_color, path_depth, path_orig_depth):
 
     pahlava = os.listdir(path_color)
-    pahlava = sorted(pahlava, key=read_office.__filenames_sorted_mapper)
-    full_pahlava = list(map(lambda x: os.path.join(path_color, x), pahlava))
+    pahlava = sorted(pahlava, key=lambda x: int(x[:-4]))
+    #full_pahlava = list(map(lambda x: os.path.join(path_color, x), pahlava))
 
     num_of_nodes = len(pahlava)
 
     pahlava_orig = os.listdir(path_orig_color)
-    pahlava_orig = sorted(pahlava_orig, key=read_office.__filenames_sorted_mapper)
-    full_pahlava_orig = map(lambda x: os.path.join(path_orig_color, x), pahlava_orig)
+    pahlava_orig = sorted(pahlava_orig, key=lambda x: int(x[:-4]))
+    #full_pahlava_orig = map(lambda x: os.path.join(path_orig_color, x), pahlava_orig)
 
-    
-    png_files, depths_files = read_office.provide_filenames(general_path)
-    png_files_orig, depths_files_orig = read_office.provide_filenames(general_path_orig)
+    depth = os.listdir(path_depth)
+    depth = sorted(depth,  key=lambda x: int(x[:-4]))
+    #full_depth = list(map(lambda x: os.path.join(path_depth, x), depth))
+
+    depth_orig = os.listdir(path_orig_depth)
+    depth_orig = sorted(depth_orig,  key=lambda x: int(x[:-4]))
+    #full_depth_orig = map(lambda x: os.path.join(path_orig_depth, x), pahlava_orig)
+
+
+    # png_files, depths_files = read_office.provide_filenames(general_path)
+    # png_files_orig, depths_files_orig = read_office.provide_filenames(general_path_orig)
+
+
+    depth_annot_orig = \
+        [[os.path.join(path_orig_color, pahlava_orig[i]), os.path.join(path_orig_depth, depth_orig[i])] for i, _ in enumerate(depth_orig)]
+
+    depth_annot = \
+        [[os.path.join(path_color, pahlava[i]), os.path.join(path_depth, depth[i])] for i, _ in enumerate(depth)]
 
     path = path_color
-    words_numbers = path.replace('_', ' ').replace('\\', ' ').split()
-    first_node = int(words_numbers[3])
-
+    words_numbers = path.replace('_', ' ').replace('\\', ' ').replace('-', ' ').split()
+    first_node = int(words_numbers[1])
 
     planes = []
 
@@ -271,24 +292,25 @@ def main(path_color, path_orig_color, general_path_orig, general_path):
 
     if len(planes_matcher) == 0:
         lambda_1 = lambda x, y, z, q: building_maps(x, y, z, q)
-        image_processing_office(lambda_1, full_pahlava_orig, depths_files_orig, CAMERA_ICL, planes_matcher, map_indx_points, planes=None, first_or_sec=1)
+        image_processing(lambda_1, depth_annot_orig, CAMERA_ICL, planes_matcher, map_indx_points, planes=None, first_or_sec=1)
+        #image_processing_office(lambda_1, full_pahlava_orig, depths_files_orig, CAMERA_ICL, planes_matcher, map_indx_points, planes=None, first_or_sec=1)
 
     map_indx_points_sorted = sorted(map_indx_points, key=map_indx_points.get)
     max_indices = map_indx_points_sorted[-5:]
 
     lambda_2 = lambda x, y, z, q, p: equation_extraction(x, y, z, q, p)
     matrices_of_points, colors = \
-        image_processing_office(lambda_2, full_pahlava, depths_files, CAMERA_ICL, planes_matcher, max_indices, planes, 2)
+        image_processing(lambda_2, depth_annot, CAMERA_ICL, planes_matcher, max_indices, planes, 2)
 
     plane_index_to_real_index = {}
 
     graph, graph_trajectory = build_the_graph(num_of_nodes, planes, plane_index_to_real_index)
     graph_estimated_state = estimate_the_graph(graph, num_of_nodes, planes, plane_index_to_real_index, graph_trajectory)
 
-    office_bias = 2
+    office_bias = 1
 
 
-    measure_error(first_node, office_bias, num_of_nodes, graph_estimated_state, 'quaternion_gt_office.txt', 'measure_error_estimated.txt',
+    measure_error(first_node, office_bias, num_of_nodes, graph_estimated_state, 'quaternion_gt_living_room.txt', 'measure_error_estimated.txt',
                   'measure_error_gt.txt')
 
     visualisation(graph_estimated_state, num_of_nodes, matrices_of_points, colors)
@@ -299,9 +321,9 @@ if __name__ == '__main__':
     parser.add_argument('path_color', type=str, help='Directory where color images are stored')
     parser.add_argument('path_orig_color', type=str, help='Directory where color images are stored')
    # parser.add_argument('number_of_nodes', type=int, help='Number of nodes in the dataset')
-    parser.add_argument('general_path_orig', type=str, help='Directory, where all the files are stored')
-    parser.add_argument('general_path', type=str, help='Directory, where working files are stored')
+    parser.add_argument('path_depth', type=str, help='Directory, where all the files are stored')
+    parser.add_argument('path_depth_orig', type=str, help='Directory, where working files are stored')
 
     args = parser.parse_args()
 
-    main(args.path_color, args.path_orig_color, args.general_path_orig, args.general_path)
+    main(args.path_color, args.path_orig_color, args.path_depth, args.path_depth_orig)
