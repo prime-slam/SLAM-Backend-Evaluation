@@ -115,7 +115,7 @@ def image_processing_office(function, colors_files, depths_files, camera_intrins
             colors_of_image = colors_of_image.reshape(-1, colors_of_image.shape[2])
             colors_of_images.append(colors_of_image)
 
-            points_of_image = read_office.getting_points(i , depths_files, camera_intrinsics)
+            points_of_image = read_office.getting_points(i, depths_files, camera_intrinsics)
             points_of_images.append(points_of_image)
             print(image)
 
@@ -149,25 +149,25 @@ def measure_error(first_node, first_gt_node, num_of_nodes, graph_estimated_state
     file_to_write_gt = open("measure_error_gt.txt", 'w')
     file_to_read_gt = open(ds_filename_gt)
 
-    bios = 0
-    bios_gt = 0
+    bias = 0
+    bias_gt = 0
 
-    in_file = file_to_read_gt.readlines()  # mind the first timestamp
+    in_file_gt = file_to_read_gt.readlines()  # mind the first timestamp
 
     if first_node == 0 and first_gt_node > 0:
-        bios = first_gt_node
+        bias = first_gt_node
     elif first_gt_node > 0:
-        bios_gt = first_gt_node
+        bias_gt = first_gt_node
 
-    for line in in_file[first_node - bios_gt:first_node + num_of_nodes - bios_gt]:
-        file_to_write_gt.write(line + '\n')
+    for line in in_file_gt[first_node - bias_gt:first_node + num_of_nodes - first_gt_node]:
+        file_to_write_gt.write(line)
     file_to_write_gt.close()
 
     file_to_write_estimated = open(file_name_estimated, 'w')
 
-    estimated_matrices = graph_estimated_state[-num_of_nodes+bios:]
+    estimated_matrices = graph_estimated_state[-num_of_nodes + bias:]
     for i, matrix in enumerate(estimated_matrices):
-        data = make_a_string(first_node + i + bios, matrix[:3, 3], rotation_matrix_to_quaternion(matrix[:3, :3]))
+        data = make_a_string(first_node + i + bias, matrix[:3, 3], rotation_matrix_to_quaternion(matrix[:3, :3]))
         file_to_write_estimated.write(data + '\n')
     file_to_write_estimated.close()
 
@@ -238,23 +238,31 @@ def visualisation(graph_estimated_state, num_of_nodes, matrices_of_points, color
 
     for pc in point_clouds:
         pc_answ += pc.transform(map_cloud_matrix[pc]).transform(reflection)
-    pc_answ = pc_answ.voxel_down_sample(0.01)
+    pc_answ = pc_answ.voxel_down_sample(0.05)
 
     o3d.visualization.draw_geometries([pc_answ])
 
 
-def main(path_color, path_orig_color, num_of_nodes, general_path_orig, general_path):
+def main(path_color, path_orig_color, general_path_orig, general_path):
 
     pahlava = os.listdir(path_color)
     pahlava = sorted(pahlava, key=read_office.__filenames_sorted_mapper)
     full_pahlava = list(map(lambda x: os.path.join(path_color, x), pahlava))
 
+    num_of_nodes = len(pahlava)
+
     pahlava_orig = os.listdir(path_orig_color)
     pahlava_orig = sorted(pahlava_orig, key=read_office.__filenames_sorted_mapper)
     full_pahlava_orig = map(lambda x: os.path.join(path_orig_color, x), pahlava_orig)
 
+    
     png_files, depths_files = read_office.provide_filenames(general_path)
     png_files_orig, depths_files_orig = read_office.provide_filenames(general_path_orig)
+
+    path = path_color
+    words_numbers = path.replace('_', ' ').replace('\\', ' ').split()
+    first_node = int(words_numbers[3])
+
 
     planes = []
 
@@ -266,7 +274,7 @@ def main(path_color, path_orig_color, num_of_nodes, general_path_orig, general_p
         image_processing_office(lambda_1, full_pahlava_orig, depths_files_orig, CAMERA_ICL, planes_matcher, map_indx_points, planes=None, first_or_sec=1)
 
     map_indx_points_sorted = sorted(map_indx_points, key=map_indx_points.get)
-    max_indices = map_indx_points_sorted[-4:]
+    max_indices = map_indx_points_sorted[-5:]
 
     lambda_2 = lambda x, y, z, q, p: equation_extraction(x, y, z, q, p)
     matrices_of_points, colors = \
@@ -277,7 +285,10 @@ def main(path_color, path_orig_color, num_of_nodes, general_path_orig, general_p
     graph, graph_trajectory = build_the_graph(num_of_nodes, planes, plane_index_to_real_index)
     graph_estimated_state = estimate_the_graph(graph, num_of_nodes, planes, plane_index_to_real_index, graph_trajectory)
 
-    measure_error(204, 2, num_of_nodes, graph_estimated_state, 'quaternion_gt_office.txt', 'measure_error_estimated.txt',
+    office_bias = 2
+
+
+    measure_error(first_node, office_bias, num_of_nodes, graph_estimated_state, 'quaternion_gt_office.txt', 'measure_error_estimated.txt',
                   'measure_error_gt.txt')
 
     visualisation(graph_estimated_state, num_of_nodes, matrices_of_points, colors)
@@ -287,11 +298,10 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Build a trajectory')
     parser.add_argument('path_color', type=str, help='Directory where color images are stored')
     parser.add_argument('path_orig_color', type=str, help='Directory where color images are stored')
-    parser.add_argument('number_of_nodes', type=int, help='Number of nodes in the dataset')
+   # parser.add_argument('number_of_nodes', type=int, help='Number of nodes in the dataset')
     parser.add_argument('general_path_orig', type=str, help='Directory, where all the files are stored')
     parser.add_argument('general_path', type=str, help='Directory, where working files are stored')
 
     args = parser.parse_args()
 
-    main(args.path_color, args.path_orig_color, args.number_of_nodes, args.general_path_orig, args.general_path)
-    
+    main(args.path_color, args.path_orig_color, args.general_path_orig, args.general_path)
