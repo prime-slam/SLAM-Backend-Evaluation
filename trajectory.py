@@ -3,6 +3,9 @@ from typing import List
 
 import numpy as np
 import math
+
+from memory_profiler import profile
+
 from config import CAMERA_ICL, PM, MAP_IP
 import cv2
 import read_office
@@ -152,7 +155,7 @@ def measure_error(first_node, first_gt_node, num_of_nodes, graph_estimated_state
     bias = 0
     bias_gt = 0
 
-    in_file_gt = file_to_read_gt.readlines()  # mind the first timestamp
+    #in_file_gt = file_to_read_gt.readlines()  # mind the first timestamp
 
     if first_node == 0 and first_gt_node > 0:
         bias = first_gt_node
@@ -222,7 +225,7 @@ def build_the_graph(num_of_nodes, planes: List[List[Plane]], plane_index_to_real
 
     return graph, graph_trajectory
 
-
+@profile
 def visualisation(graph_estimated_state, num_of_nodes, matrices_of_points, colors):
 
     point_clouds = []
@@ -247,9 +250,9 @@ def visualisation(graph_estimated_state, num_of_nodes, matrices_of_points, color
         pc_answ += pc.transform(map_cloud_matrix[pc]).transform(reflection)
     pc_answ = pc_answ.voxel_down_sample(0.05)
 
-    o3d.visualization.draw_geometries([pc_answ])
+    #o3d.visualization.draw_geometries([pc_answ])
 
-
+@profile
 def main(path_color, path_orig_color, path_depth, path_orig_depth):
 
     pahlava = os.listdir(path_color)
@@ -317,6 +320,7 @@ def main(path_color, path_orig_color, path_depth, path_orig_depth):
 
 
 if __name__ == '__main__':
+
     parser = argparse.ArgumentParser(description='Build a trajectory')
     parser.add_argument('path_color', type=str, help='Directory where color images are stored')
     parser.add_argument('path_orig_color', type=str, help='Directory where color images are stored')
