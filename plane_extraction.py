@@ -29,6 +29,15 @@ def array_to_string(array: np.array) -> str:
     return string
 
 
+def string_to_array(string):
+    values = string.split('#')
+    answ = []
+
+    for value in values:
+        answ.append(int(value))
+
+    return np.asarray(answ)
+
 def convert_from_plane_to_3d(u, v, depth, cam: Camera):
     #result = np.zeros((u.shape, 3))
     x_over_z = (v - cam.cx) / cam.focal_x # создать матрицу result (rows, colums, 3)
@@ -44,6 +53,13 @@ def convert_from_plane_to_3d(u, v, depth, cam: Camera):
 
     return np.dstack((x_matrix, y_matrix, z_matrix))
 
+
+def generate_color(set_of_generated_colors):
+    answ = np.random.randint(255, size=3)
+    while array_to_string(answ) in set_of_generated_colors:
+        answ = generate_color(set_of_generated_colors)
+    set_of_generated_colors.add(array_to_string(answ))
+    return answ
 
 
 def get_normal(points):
@@ -105,3 +121,100 @@ def equation_extraction(points, colors, color_to_index, max_planes, planes):
     # o3d.visualization.draw_geometries([pc])
 
     return planes
+
+
+def building_maps_frontend(points, annot, indx_to_color, indx_to_max_num_points):
+
+    annot_unique = np.unique(annot, axis=0)
+
+    num_unique_colors = annot_unique.size
+    num_of_points = points.size
+
+    unique_indices_without_black = list(filter(lambda x: (x != 1), annot_unique))
+
+    for color_index in unique_indices_without_black:  # if the plane is new
+        indx_to_color[color_index] = array_to_string(generate_color())  # append (color:index) to map with the next index
+        indices = np.where((annot == color_index))
+        if (color_index in indx_to_max_num_points and len(indices[0]) > indx_to_max_num_points[color_index]) \
+                or color_index not in indx_to_max_num_points:
+            indx_to_max_num_points[color_index] = len(indices[0])
+
+    return indx_to_color, indx_to_max_num_points
+
+
+def planes_extraction_for_frontend(points, annot, indx, indx_to_max_num_points, prev_planes, indx_to_color,
+                                   set_of_generated_colors):
+
+    planes_2_matched = []
+    good_ones = []
+    true_colors = np.zeros(points.shape)
+
+    annot_unique = np.unique(annot, axis=0)
+
+    # нужен глобальный индекс
+    unique_annot_without_black = list(filter(lambda x: (x != 1), annot_unique))
+
+    indices_of_planes = {}
+    for i, annot_num in enumerate(unique_annot_without_black):
+
+        indx = len(indx_to_max_num_points)
+        indices = np.where(annot == annot_num)
+        plane_points = points[indices[0]]
+        equation = get_normal(plane_points)
+        #len_before_loop = len(planes_2_matched)
+        cur_indx = 0
+        if prev_planes != None:
+            min_bias = 10
+            most_correct_plane = -1
+            for plane in prev_planes:
+                deviation = np.dot(plane.equation[:3], equation[:3]) # косинус угла: наибольший, когда плоскости совпадают
+                bias = math.acos(deviation) + math.fabs(plane.equation[-1] - equation[-1])
+                if bias < min_bias:
+                    min_bias = bias
+                    most_correct_plane = plane.index
+            if most_correct_plane == -1:
+                #indx += 1
+                p = Plane(equation, indx)
+                indx_to_color[indx] = generate_color(set_of_generated_colors)
+                true_colors[indices[0]] = indx_to_color[indx]
+                planes_2_matched.append(p)
+                indices_of_planes[indx] = len(indices[0])
+            elif most_correct_plane != -1:
+                if min_bias < 1 and most_correct_plane not in indices_of_planes:
+                    indices_of_planes[most_correct_plane] = len(indices[0])
+                    p = Plane(equation, most_correct_plane)
+                    planes_2_matched.append(p)
+                    if (most_correct_plane in indx_to_max_num_points and len(indices[0]) > indx_to_max_num_points[most_correct_plane]) \
+                            or most_correct_plane not in indx_to_max_num_points:
+                        indx_to_max_num_points[most_correct_plane] = len(indices[0])
+                    true_colors[indices[0]] = indx_to_color[most_correct_plane]
+                elif min_bias < 1 and most_correct_plane in indices_of_planes:
+                    if (len(indices[0]) > indices_of_planes[most_correct_plane]):
+                        for pl in planes_2_matched:
+                            if pl.index == most_correct_plane:
+                                planes_2_matched.remove(pl)
+                                break
+                        p = Plane(equation, most_correct_plane)
+                        planes_2_matched.append(p)
+                        if (most_correct_plane in indx_to_max_num_points and len(indices[0]) > indx_to_max_num_points[
+                            most_correct_plane]) \
+                                or most_correct_plane not in indx_to_max_num_points:
+                            indx_to_max_num_points[most_correct_plane] = len(indices[0])
+                        indices_of_planes[most_correct_plane] = len(indices[0])
+                        true_colors[indices[0]] = indx_to_color[most_correct_plane]
+        else:
+            p = Plane(equation, indx)
+            indx_to_color[indx] = generate_color(set_of_generated_colors)
+            true_colors[indices[0]] = indx_to_color[indx]
+            indices_of_planes[indx] = len(indices[0])
+            planes_2_matched.append(p)
+            if (indx in indx_to_max_num_points and len(indices[0]) > indx_to_max_num_points[indx]) \
+                    or indx not in indx_to_max_num_points:
+                indx_to_max_num_points[indx] = len(indices[0])
+    return indx, planes_2_matched, true_colors
+
+
+
+
+
+
