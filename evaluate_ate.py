@@ -149,7 +149,6 @@ def main(gt_file, estimated_file):
     if verbose:
         print
         "compared_pose_pairs %d pairs" % (len(trans_error))
-
         print
         "absolute_translational_error.rmse %f m" % numpy.sqrt(numpy.dot(trans_error, trans_error) / len(trans_error))
         print
@@ -203,10 +202,6 @@ def main(gt_file, estimated_file):
         ax.set_xlabel('x [m]')
         ax.set_ylabel('y [m]')
         plt.savefig(args.plot, dpi=90)
-
-
-
-
 
 
 if __name__ == "__main__":
