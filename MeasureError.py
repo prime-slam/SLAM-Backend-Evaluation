@@ -91,7 +91,7 @@ class MeasureError(object):
 
     def measure_error(self):
 
-        file_to_write_gt = open("measure_error_gt.txt", 'w')
+        file_to_write_gt = open(self.file_name_gt, 'w')
         file_to_read_gt = open(self.ds_filename_gt)
 
         bios = 0
@@ -104,8 +104,8 @@ class MeasureError(object):
         elif self.first_gt_node > 0:
             bios_gt = self.first_gt_node
 
-        for line in in_file[self.first_node - bios_gt:self.first_node + self.num_of_nodes - bios_gt]:
-            file_to_write_gt.write(line + '\n')
+        for line in in_file[self.first_node - bios_gt:self.first_node + self.num_of_nodes - bios_gt - 1]:
+            file_to_write_gt.write(line)
         file_to_write_gt.close()
 
         file_to_write_estimated = open(self.file_name_estimated, 'w')

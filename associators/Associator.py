@@ -1,5 +1,6 @@
 
 from abc import ABC, abstractmethod
+from typing import List
 
 import numpy as np
 
@@ -7,8 +8,7 @@ from Pcd import Pcd
 
 
 class Associator(ABC):
-    def __init__(self, pcd_s: list[Pcd]):
-        self.__pcd_s = pcd_s
+    def __init__(self):
         self.__color_to_indx = None
 
     @staticmethod
@@ -19,5 +19,5 @@ class Associator(ABC):
         return string
 
     @abstractmethod
-    def associate(self):
+    def associate(self, pcd_s: List[Pcd]):
         pass

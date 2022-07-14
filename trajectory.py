@@ -2,6 +2,7 @@ import argparse
 import os
 
 import config
+from SLAMGraph import SLAMGraph
 from associators.AssociatorAnnot import AssociatorAnnot
 from associators.AssociatorFront import AssociatorFront
 from MeasureError import MeasureError
@@ -9,7 +10,6 @@ from pcdBuilders.PcdBuilderLiving import PcdBuilderLiving
 from pcdBuilders.PcdBuilderOffice import PcdBuilderOffice
 from pcdBuilders.PcdBuilderPointCloud import PcdBuilderPointcloud
 from PostProcessing import PostProcessing
-from SLAMGraph import SLAMGraph
 from Visualisation import Visualisation
 
 
@@ -42,11 +42,13 @@ def main(main_data: str,
         else:
             pcd_b = PcdBuilderOffice(camera, annot_list)
 
-        for i, image in enumerate(annot_list):
+        for i, image in enumerate(main_data_list):
             pcds.append(pcd_b.build_pcd(i, main_data_list))
 
-        associator = AssociatorAnnot(pcds, color_to_indx={})
-        associator.associate()
+        print()
+
+        associator = AssociatorAnnot(color_to_indx={})
+        associator.associate(pcds)
 
     else:
         folders = os.listdir(main_data)
@@ -63,25 +65,25 @@ def main(main_data: str,
 
         pcd_b = PcdBuilderPointcloud(camera, annot_list)
 
-        for i, file in annot_list:
-            pcds.append(pcd_b.build_pcd(i, annot_list))
+        for i, file in enumerate(annot_list):
+            pcds.append(pcd_b.build_pcd(i, main_data_list))
 
-        associator = AssociatorFront(pcds)
-        associator.associate()
+        print()
 
-    post_processing = PostProcessing(pcds)
-    post_processing.post_process()
+        associator = AssociatorFront()
+        associator.associate(pcds)
 
-    for i, pcd in pcds:
-        if i < first_node or i > first_node + num_of_nodes:
-            pcds.remove(pcd)
+    post_processing = PostProcessing()
+    max_tracks = post_processing.post_process(pcds)
+
+    pcds = pcds[first_node: first_node + num_of_nodes]
 
     slam_graph = SLAMGraph()
-    graph_estimated_state = slam_graph.estimate_the_graph(pcds)
+    graph_estimated_state = slam_graph.estimate_the_graph(pcds, num_of_nodes, first_node,  max_tracks)
 
     measure_error = MeasureError(first_node,
                                  first_gt_node,
-                                 len(pcds),
+                                 num_of_nodes,
                                  len(annot_list),
                                  graph_estimated_state,
                                  ds_filename_gt,
@@ -89,8 +91,8 @@ def main(main_data: str,
                                  file_name_gt)
     measure_error.measure_error()
 
-    visual = Visualisation(graph_estimated_state, num_of_nodes, pcds)
-    visual.visualisation()
+    visual = Visualisation(graph_estimated_state, num_of_nodes)
+    visual.visualisation(pcds)
 
 
 if __name__ == '__main__':
@@ -105,7 +107,6 @@ if __name__ == '__main__':
     parser.add_argument('ds_filename_gt', type=str, help='Directory where color images are stored')
     parser.add_argument('file_name_estimated', type=str, help='Directory where color images are stored')
     parser.add_argument('file_name_gt', type=str, help='Directory where color images are stored')
-
 
     args = parser.parse_args()
 

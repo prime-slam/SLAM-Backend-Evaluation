@@ -1,3 +1,5 @@
+from typing import List
+
 import numpy as np
 
 
@@ -6,10 +8,10 @@ from annotators.Annotator import Annotator
 
 
 class AnnotatorPointCloud(Annotator):
-    def __init__(self, array_path_annot: list[str]):
+    def __init__(self, array_path_annot: List[str]):
         super().__init__(array_path_annot)
 
-    def __get_planes(self, pcd, image_colors: str):
+    def _get_planes(self, pcd, image_colors: str):
         planes = []
         annot_of_image = np.load(image_colors)
         annot_unique = np.unique(annot_of_image, axis=0)

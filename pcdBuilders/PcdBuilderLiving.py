@@ -1,3 +1,5 @@
+from typing import List
+
 import cv2
 import numpy as np
 
@@ -8,7 +10,7 @@ from pcdBuilders.PcdBuilder import PcdBuilder
 
 
 class PcdBuilderLiving(PcdBuilder):
-    def __init__(self, camera: Camera, annot_path: list[str]):
+    def __init__(self, camera: Camera, annot_path: List[str]):
         super().__init__(camera)
         self.annot = AnnotatorImage(annot_path)
 
@@ -23,11 +25,11 @@ class PcdBuilderLiving(PcdBuilder):
 
         return np.dstack((x_matrix, y_matrix, z_matrix))
 
-    def __get_points(self, i: int, array_file_names: list[str]) -> Pcd:
+    def _get_points(self, i: int, array_file_names: List[str]) -> Pcd:
 
         matrix_depth = cv2.imread(array_file_names[i], cv2.IMREAD_ANYDEPTH)
 
-        rows, columns, _ = matrix_depth.shape
+        rows, columns = matrix_depth.shape
         columns_indices = np.arange(columns)
 
         matrix_v = np.tile(columns_indices, (rows, 1))
@@ -40,8 +42,3 @@ class PcdBuilderLiving(PcdBuilder):
         )
         return Pcd(matrix_xyz.reshape(-1, matrix_xyz.shape[2]))
 
-    def build_pcd(self, image_number: int, array_file_names_depth: list[str]):
-        pcd = self.__get_points(image_number, array_file_names_depth)
-        pcd = self.annot.annotate(pcd, image_number)
-
-        return pcd
