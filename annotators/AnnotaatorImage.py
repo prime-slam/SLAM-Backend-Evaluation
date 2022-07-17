@@ -3,8 +3,7 @@ from typing import List
 import cv2
 import numpy as np
 
-
-from Plane import Plane
+from dto.Plane import Plane
 from annotators.Annotator import Annotator
 
 

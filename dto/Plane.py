@@ -1,7 +1,7 @@
 import numpy as np
 
 
-class Plane(object):
+class Plane:
     def __init__(self, equation, track: int, color, indices):
         self.equation = equation
         self.track = track
@@ -19,4 +19,3 @@ class Plane(object):
         normal = int(np.sign(d)) * n
         d *= np.sign(d)
         return np.asarray([normal[0], normal[1], normal[2], d])
-

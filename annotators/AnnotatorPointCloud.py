@@ -1,10 +1,8 @@
 from typing import List
+from dto.Plane import Plane
+from annotators.Annotator import Annotator
 
 import numpy as np
-
-
-from Plane import Plane
-from annotators.Annotator import Annotator
 
 
 class AnnotatorPointCloud(Annotator):

@@ -1,23 +1,20 @@
-from typing import List
-
 import numpy as np
-
-from annotators.AnnotatorPointCloud import AnnotatorPointCloud
-from Camera import Camera
-from Pcd import Pcd
-
-
 import open3d as o3d
 
+from typing import List
+from annotators.AnnotatorPointCloud import AnnotatorPointCloud
+from Camera import Camera
+from dto.Pcd import Pcd
 from pcdBuilders.PcdBuilder import PcdBuilder
 
 
 class PcdBuilderPointcloud(PcdBuilder):
-    def __init__(self, camera: Camera, annot_path: List[str]):
-        super().__init__(camera)
-        self.annot = AnnotatorPointCloud(annot_path)
+    def __init__(self, camera: Camera, annot: AnnotatorPointCloud):
+        super().__init__(camera, annot)
 
-    def _get_points(self, image_number: int, array_file_names: List[str]):
-        pc = o3d.io.read_point_cloud(array_file_names[image_number])
+    def _get_points(self, depth_image_path):
+        pc = o3d.io.read_point_cloud(depth_image_path)
+        # if image_number > 50:
+        #     o3d.visualization.draw_geometries([pc])
 
         return Pcd(np.asarray(pc.points) / 1000)

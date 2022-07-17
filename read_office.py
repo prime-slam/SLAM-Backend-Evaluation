@@ -8,9 +8,9 @@ def __filenames_sorted_mapper(filename: str) -> int:
     return int(filename.split(".")[0].split("_")[-1])
 
 
-def __load_camera_params_from_file(pic_num, depth_images) -> dict:
+def __load_camera_params_from_file(depth_image) -> dict:
     result = {}
-    params_path = depth_images[pic_num][:-5] + "txt"
+    params_path = depth_image[:-5] + "txt"
     with open(params_path, 'r') as input_file:
         for line in input_file:
             field_name_start = 0
@@ -48,9 +48,9 @@ def provide_filenames(general_path) -> (list, list):
     return full_rgb_filenames, full_depth_filenames
 
 
-def __get_camera_params_for_frame(pic_num, depth_images):
+def __get_camera_params_for_frame(depth_image):
     # Adopted from https://www.doc.ic.ac.uk/~ahanda/VaFRIC/getcamK.m
-    camera_params_raw = __load_camera_params_from_file(pic_num, depth_images)
+    camera_params_raw = __load_camera_params_from_file(depth_image)
     cam_dir = np.fromstring(camera_params_raw["cam_dir"][1:-1], dtype=float, sep=',').T
     cam_right = np.fromstring(camera_params_raw["cam_right"][1:-1], dtype=float, sep=',').T
     cam_up = np.fromstring(camera_params_raw["cam_up"][1:-1], dtype=float, sep=',').T
@@ -77,10 +77,9 @@ def __get_camera_params_for_frame(pic_num, depth_images):
     return fx, fy, cx, cy
 
 
-def getting_points(frame_num, depth_images, cam_intrinsic):
+def getting_points(depth_frame_path, cam_intrinsic):
     # Adopted from https://www.doc.ic.ac.uk/~ahanda/VaFRIC/compute3Dpositions.m
-    depth_frame_path = depth_images[frame_num]
-    fx, fy, cx, cy = __get_camera_params_for_frame(frame_num, depth_images)
+    fx, fy, cx, cy = __get_camera_params_for_frame(depth_frame_path)
 
     x_matrix = np.tile(np.arange(cam_intrinsic.width), (cam_intrinsic.height, 1)).flatten()
     y_matrix = np.transpose(np.tile(np.arange(cam_intrinsic.height), (cam_intrinsic.width, 1))).flatten()

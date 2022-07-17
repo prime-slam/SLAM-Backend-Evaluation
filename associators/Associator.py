@@ -1,15 +1,14 @@
-
 from abc import ABC, abstractmethod
 from typing import List
 
 import numpy as np
 
-from Pcd import Pcd
+from dto.Pcd import Pcd
 
 
 class Associator(ABC):
     def __init__(self):
-        self.__color_to_indx = None
+        pass
 
     @staticmethod
     def array_to_string(array: np.array) -> str:

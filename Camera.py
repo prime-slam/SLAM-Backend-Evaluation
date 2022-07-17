@@ -1,4 +1,4 @@
-class Camera(object):
+class Camera:
     def __init__(self, width, height, cx, cy, focal_x, focal_y, scale):
         self.width = width
         self.height = height

@@ -1,21 +1,21 @@
 from annotators.Annotator import *
 from Camera import Camera
-from Pcd import Pcd
+from dto.Pcd import Pcd
 
 
 class PcdBuilder(ABC):
-    def __init__(self, camera: Camera, annot=None):
+    def __init__(self, camera: Camera, annot):
         self.cam = camera
-        self.annot = annot
+        self._annot = annot
 
     @abstractmethod
-    def _get_points(self, image_number: int, array_file_names: List[str]) -> Pcd:
+    def _get_points(self, path_depth_image) -> Pcd:
         pass
 
-    def build_pcd(self, image_number: int, array_file_names_depth: List[str]):
-        pcd = self._get_points(image_number, array_file_names_depth)
-        pcd = self.annot.annotate(pcd, image_number)
+    def build_pcd(self, path_depth_image, pcd_num):
+        pcd = self._get_points(path_depth_image)
+        pcd = self._annot.annotate(pcd, pcd_num)
 
-        print(array_file_names_depth[image_number])
+        print(path_depth_image)
 
         return pcd

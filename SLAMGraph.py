@@ -1,12 +1,12 @@
-from typing import List, Dict, Any
+from typing import List
 
 import numpy as np
-from mrob.mrob import FGraph, geometry, registration, LM
+from mrob.mrob import FGraph, geometry, LM
 
-from Pcd import Pcd
+from dto.Pcd import Pcd
 
 
-class SLAMGraph(object):
+class SLAMGraph:
 
     def __init__(self):
         self.graph = FGraph()
@@ -14,8 +14,7 @@ class SLAMGraph(object):
         self.plane_index_to_real_index = {}
 
     def __build_the_graph(self, pcd_s: List[Pcd], num_of_nodes: int, first_node: int, needed_indices: List[int]):
-        needed_pcds = pcd_s[first_node: first_node + num_of_nodes]
-        for pcd in needed_pcds:
+        for pcd in pcd_s:
             real_indx = len(self.plane_index_to_real_index)
             for plane in pcd.planes:
                 if plane.track in needed_indices:
@@ -23,15 +22,15 @@ class SLAMGraph(object):
                         self.plane_index_to_real_index[plane.track] = real_indx
                         real_indx += 1
 
-        for i, _ in enumerate(self.plane_index_to_real_index):
+        for el in self.plane_index_to_real_index:
             self.graph.add_node_plane_4d(
                 np.array([1, 0, 0, 0]))
 
-        for i in range(num_of_nodes):
+        for el in pcd_s:
             next_node = self.graph.add_node_pose_3d(geometry.SE3())
             self.graph_trajectory.append(next_node)
         self.graph.add_factor_1pose_3d(geometry.SE3(), self.graph_trajectory[0], 1e6 * np.identity(6))
-        return needed_pcds
+        return pcd_s
 
     def estimate_the_graph(self, pcd_s: list[Pcd], num_of_nodes: int, first_node: int, needed_indices: List[int]):
 

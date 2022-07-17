@@ -1,7 +1,6 @@
 from abc import ABC, abstractmethod
 from typing import List
-
-from Pcd import Pcd
+from dto.Pcd import Pcd
 
 
 class Annotator(ABC):

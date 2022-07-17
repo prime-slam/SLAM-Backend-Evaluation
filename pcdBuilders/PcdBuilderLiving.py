@@ -5,14 +5,13 @@ import numpy as np
 
 from annotators.AnnotaatorImage import AnnotatorImage
 from Camera import Camera
-from Pcd import Pcd
+from dto.Pcd import Pcd
 from pcdBuilders.PcdBuilder import PcdBuilder
 
 
 class PcdBuilderLiving(PcdBuilder):
-    def __init__(self, camera: Camera, annot_path: List[str]):
-        super().__init__(camera)
-        self.annot = AnnotatorImage(annot_path)
+    def __init__(self, camera: Camera, annot: AnnotatorImage):
+        super().__init__(camera, annot)
 
     def __convert_from_plane_to_3d(self, u, v, depth):
         x_over_z = (v - self.cam.cx) / self.cam.focal_x  # создать матрицу result (rows, colums, 3)
@@ -25,9 +24,9 @@ class PcdBuilderLiving(PcdBuilder):
 
         return np.dstack((x_matrix, y_matrix, z_matrix))
 
-    def _get_points(self, i: int, array_file_names: List[str]) -> Pcd:
+    def _get_points(self, depth_image_path) -> Pcd:
 
-        matrix_depth = cv2.imread(array_file_names[i], cv2.IMREAD_ANYDEPTH)
+        matrix_depth = cv2.imread(depth_image_path, cv2.IMREAD_ANYDEPTH)
 
         rows, columns = matrix_depth.shape
         columns_indices = np.arange(columns)
@@ -41,4 +40,3 @@ class PcdBuilderLiving(PcdBuilder):
             matrix_depth,
         )
         return Pcd(matrix_xyz.reshape(-1, matrix_xyz.shape[2]))
-

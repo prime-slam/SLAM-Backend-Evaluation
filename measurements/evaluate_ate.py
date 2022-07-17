@@ -42,7 +42,8 @@ trajectory and the estimated trajectory.
 import sys
 import numpy
 import argparse
-import associate
+
+from measurements import associate
 
 
 def align(model, data):
@@ -176,7 +177,6 @@ def main(gt_file, estimated_file):
 
         matplotlib.use('Agg')
         import matplotlib.pyplot as plt
-        import matplotlib.pylab as pylab
         #from matplotlib.patches import Ellipse
 
         fig = plt.figure()

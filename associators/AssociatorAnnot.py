@@ -1,14 +1,12 @@
 from typing import List
-
-from Pcd import Pcd
+from dto.Pcd import Pcd
 from associators.Associator import Associator
 
 
 class AssociatorAnnot(Associator):
-    def __init__(self, color_to_indx: dict):
+    def __init__(self, color_to_indx={}):
         super().__init__()
         self.__color_to_indx = color_to_indx
-
 
     def associate(self, pcd_s: List[Pcd]):
         if len(self.__color_to_indx) == 0:
