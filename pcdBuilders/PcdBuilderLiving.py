@@ -3,7 +3,7 @@ from typing import List
 import cv2
 import numpy as np
 
-from annotators.AnnotaatorImage import AnnotatorImage
+from annotators.AnnotatorImage import AnnotatorImage
 from Camera import Camera
 from dto.Pcd import Pcd
 from pcdBuilders.PcdBuilder import PcdBuilder

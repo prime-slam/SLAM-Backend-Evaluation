@@ -4,7 +4,7 @@ import read_office
 
 from Camera import Camera
 from dto.Pcd import Pcd
-from annotators.AnnotaatorImage import AnnotatorImage
+from annotators.AnnotatorImage import AnnotatorImage
 from pcdBuilders.PcdBuilder import PcdBuilder
 
 

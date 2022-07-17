@@ -3,7 +3,7 @@ import os
 
 import config
 from SLAMGraph import SLAMGraph
-from annotators.AnnotaatorImage import AnnotatorImage
+from annotators.AnnotatorImage import AnnotatorImage
 from annotators.AnnotatorPointCloud import AnnotatorPointCloud
 from associators.AssociatorAnnot import AssociatorAnnot
 from associators.AssociatorFront import AssociatorFront
