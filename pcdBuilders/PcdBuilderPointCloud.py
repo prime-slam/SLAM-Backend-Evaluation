@@ -16,9 +16,6 @@ class PcdBuilderPointcloud(PcdBuilder):
 
     def _get_points(self, depth_image_path, i: int):
         pc = o3d.io.read_point_cloud(depth_image_path)
-        # if 52 < i < 65:
-        #     print('now ' + str(i))
-        #     o3d.visualization.draw_geometries([pc])
 
         return Pcd(np.asarray(pc.points) / 1000)
 
