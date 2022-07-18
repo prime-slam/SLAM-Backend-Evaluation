@@ -9,11 +9,11 @@ class PcdBuilder(ABC):
         self._annot = annot
 
     @abstractmethod
-    def _get_points(self, path_depth_image, pcd_num) -> Pcd:
+    def _get_points(self, path_depth_image) -> Pcd:
         pass
 
     def build_pcd(self, path_depth_image, pcd_num):
-        pcd = self._get_points(path_depth_image, pcd_num)
+        pcd = self._get_points(path_depth_image)
         pcd = self._annot.annotate(pcd, pcd_num)
 
         print(path_depth_image)
