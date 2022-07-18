@@ -10,7 +10,7 @@ class Visualisation :
         self.graph_estimated_state = graph_estimated_state
 
     @staticmethod
-    def visual_one(pcd: Pcd, transforms: List = []):
+    def visualisation_pcd(pcd: Pcd, transforms: List = []):
         pc = o3d.geometry.PointCloud()
         pc.points = o3d.utility.Vector3dVector(pcd.points)
 
@@ -22,7 +22,7 @@ class Visualisation :
         for transform in transforms:
             pc = pc.transform(transform)
 
-        # o3d.visualization.draw_geometries([pc])
+
         return pc
 
     def visualisation(self, pcd_s: List[Pcd], graph_estimated_state):
@@ -36,10 +36,10 @@ class Visualisation :
 
         pc_answ = o3d.geometry.PointCloud()
         for i in range(num_of_nodes):
-            pc = self.visual_one(pcd_s[i], [graph_estimated_state[-(i + 1)], reflection])
+            pc = self.visualisation_pcd(pcd_s[-(i + 1)], [graph_estimated_state[-(i + 1)], reflection])
             pc = pc.voxel_down_sample(0.05)
 
-            pcd_s[num_of_nodes - i - 1].points = None
+            pcd_s[-(i + 1)].points = None
             pc_answ += pc
         pc_answ = pc_answ.voxel_down_sample(0.05)
 

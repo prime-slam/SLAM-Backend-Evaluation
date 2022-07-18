@@ -15,4 +15,3 @@ class Annotator(ABC):
         pcd.planes = self._get_planes(pcd, self.array_path_to_annot[image_number])
 
         return pcd
-

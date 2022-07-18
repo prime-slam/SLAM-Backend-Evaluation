@@ -1,5 +1,6 @@
 import argparse
 import os
+import open3d as o3d
 
 import config
 from SLAMGraph import SLAMGraph
@@ -15,18 +16,11 @@ from PostProcessing import PostProcessing
 from Visualisation import Visualisation
 
 
-def create_main_list_image(main_data_path: str):
+def create_data_list_image(main_data_path: str):
     depth = os.listdir(main_data_path)
     depth = sorted(depth, key=lambda x: int(x[:-4]))
     main_data_list = list(map(lambda x: os.path.join(main_data_path, x), depth))
     return main_data_list
-
-
-def create_annot_list_image(annot_path):
-    colors_orig = os.listdir(annot_path)
-    colors_orig = sorted(colors_orig, key=lambda x: int(x[:-4]))
-    annot_list = list(map(lambda x: os.path.join(annot_path, x), colors_orig))
-    return annot_list
 
 
 def create_main_and_annot_list(main_data_path: str):
@@ -53,17 +47,15 @@ def main(main_data_path: str,
          first_node: int,
          first_gt_node: int,
          num_of_nodes: int,
-         ds_filename_gt: str,
-         file_name_estimated: str,
-         file_name_gt: str):
+         ds_filename_gt: str):
 
     camera = config.CAMERA_ICL
     pcds = []
 
     if which_format == 1 or which_format == 2:
 
-        main_data_list = create_main_list_image(main_data_path)[first_node: first_node + num_of_nodes]
-        annot_list = create_annot_list_image(annot_path)[first_node: first_node + num_of_nodes]
+        main_data_list = create_data_list_image(main_data_path)[first_node: first_node + num_of_nodes]
+        annot_list = create_data_list_image(annot_path)[first_node: first_node + num_of_nodes]
 
         annot = AnnotatorImage(annot_list)
         if which_format == 1:
@@ -79,6 +71,9 @@ def main(main_data_path: str,
 
     else:
         annot_list, main_data_list = create_main_and_annot_list(main_data_path)
+        annot_list = annot_list[first_node: first_node + num_of_nodes]
+        main_data_list = main_data_list[first_node: first_node + num_of_nodes]
+
         annot = AnnotatorPointCloud(annot_list)
         pcd_b = PcdBuilderPointcloud(camera, annot)
 
@@ -92,15 +87,11 @@ def main(main_data_path: str,
     max_tracks = post_processing.post_process(pcds)
 
     slam_graph = SLAMGraph()
-    graph_estimated_state = slam_graph.estimate_the_graph(pcds, num_of_nodes, first_node,  max_tracks)
+    graph_estimated_state = slam_graph.estimate_the_graph(pcds, max_tracks)
 
     measure_error = MeasureError(ds_filename_gt,
                                  len(annot_list))
-    measure_error.measure_error(first_node,
-                                first_gt_node,
-                                graph_estimated_state,
-                                file_name_estimated,
-                                file_name_gt)
+    measure_error.measure_error(first_node, first_gt_node, graph_estimated_state)
 
     visualisation = Visualisation(graph_estimated_state)
     visualisation.visualisation(pcds, graph_estimated_state)
@@ -114,10 +105,8 @@ if __name__ == '__main__':
     parser.add_argument('which_format', type=int, choices=[1, 2, 3], help='living room = 1, office = 2, point clouds = 3')
     parser.add_argument('first_node', type=int, help='from what node algorithm should start')
     parser.add_argument('first_gt_node', type=int, help='From what node gt references start')
-    parser.add_argument('num_of_nodes', type=int, help='Directory where color images are stored')
+    parser.add_argument('num_of_nodes', type=int, help='Number of needed nodes')
     parser.add_argument('ds_filename_gt', type=str, help='Filename of a file with gt references')
-    parser.add_argument('file_name_estimated', type=str, help='Where to write estimated quaternions')
-    parser.add_argument('file_name_gt', type=str, help='Where to write needed gt references')
 
     args = parser.parse_args()
 
@@ -127,6 +116,4 @@ if __name__ == '__main__':
          args.first_node,
          args.first_gt_node,
          args.num_of_nodes,
-         args.ds_filename_gt,
-         args.file_name_estimated,
-         args.file_name_gt)
+         args.ds_filename_gt)

@@ -7,8 +7,6 @@ from dto.Pcd import Pcd
 
 
 class Associator(ABC):
-    def __init__(self):
-        pass
 
     @staticmethod
     def array_to_string(array: np.array) -> str:

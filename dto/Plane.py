@@ -7,6 +7,7 @@ class Plane:
         self.track = track
         self.color = color
         self.plane_indices = indices
+
     @staticmethod
     def get_normal(points):
         c = np.mean(points, axis=0)
