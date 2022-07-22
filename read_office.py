@@ -11,7 +11,7 @@ def __filenames_sorted_mapper(filename: str) -> int:
 def __load_camera_params_from_file(depth_image) -> dict:
     result = {}
     params_path = depth_image[:-5] + "txt"
-    with open(params_path, 'r') as input_file:
+    with open(params_path, "r") as input_file:
         for line in input_file:
             field_name_start = 0
             field_name_end = line.find(" ")
@@ -30,8 +30,8 @@ def __load_camera_params_from_file(depth_image) -> dict:
 def provide_filenames(general_path) -> (list, list):
     path = general_path  # as paths are equal
     filenames = os.listdir(path)
-    rgb_filenames = (filter(lambda x: x.endswith(".png"), filenames))
-    depth_filenames = (filter(lambda x: x.endswith(".depth"), filenames))
+    rgb_filenames = filter(lambda x: x.endswith(".png"), filenames)
+    depth_filenames = filter(lambda x: x.endswith(".depth"), filenames)
 
     rgb_filenames = sorted(rgb_filenames, key=__filenames_sorted_mapper)
     depth_filenames = sorted(depth_filenames, key=__filenames_sorted_mapper)
@@ -51,9 +51,11 @@ def provide_filenames(general_path) -> (list, list):
 def __get_camera_params_for_frame(depth_image):
     # Adopted from https://www.doc.ic.ac.uk/~ahanda/VaFRIC/getcamK.m
     camera_params_raw = __load_camera_params_from_file(depth_image)
-    cam_dir = np.fromstring(camera_params_raw["cam_dir"][1:-1], dtype=float, sep=',').T
-    cam_right = np.fromstring(camera_params_raw["cam_right"][1:-1], dtype=float, sep=',').T
-    cam_up = np.fromstring(camera_params_raw["cam_up"][1:-1], dtype=float, sep=',').T
+    cam_dir = np.fromstring(camera_params_raw["cam_dir"][1:-1], dtype=float, sep=",").T
+    cam_right = np.fromstring(
+        camera_params_raw["cam_right"][1:-1], dtype=float, sep=","
+    ).T
+    cam_up = np.fromstring(camera_params_raw["cam_up"][1:-1], dtype=float, sep=",").T
     focal = np.linalg.norm(cam_dir)
     aspect = np.linalg.norm(cam_right) / np.linalg.norm(cam_up)
     angle = 2 * math.atan(np.linalg.norm(cam_right) / 2 / focal)
@@ -79,24 +81,40 @@ def __get_camera_params_for_frame(depth_image):
 
 def getting_points(depth_frame_path, cam_intrinsic):
     # Adopted from https://www.doc.ic.ac.uk/~ahanda/VaFRIC/compute3Dpositions.m
-    fx, fy, cx, cy = __get_camera_params_for_frame(depth_frame_path)
+    fx, fy, cx, cy = (
+        cam_intrinsic.focal_x,
+        cam_intrinsic.focal_y,
+        cam_intrinsic.cx,
+        cam_intrinsic.cy,
+    )
 
-    x_matrix = np.tile(np.arange(cam_intrinsic.width), (cam_intrinsic.height, 1)).flatten()
-    y_matrix = np.transpose(np.tile(np.arange(cam_intrinsic.height), (cam_intrinsic.width, 1))).flatten()
+    x_matrix = np.tile(
+        np.arange(cam_intrinsic.width), (cam_intrinsic.height, 1)
+    ).flatten()
+    y_matrix = np.transpose(
+        np.tile(np.arange(cam_intrinsic.height), (cam_intrinsic.width, 1))
+    ).flatten()
     x_modifier = (x_matrix - cx) / fx
     y_modifier = (y_matrix - cy) / fy
 
     points = np.zeros((cam_intrinsic.width * cam_intrinsic.height, 3))
 
-    with open(depth_frame_path, 'r') as input_file:
+    with open(depth_frame_path, "r") as input_file:
         data = input_file.read()
-        depth_data = np.asarray(list(
-            map(lambda x: float(x), data.split(" ")[:cam_intrinsic.height * cam_intrinsic.width])
-        ))
+        depth_data = np.asarray(
+            list(
+                map(
+                    lambda x: float(x),
+                    data.split(" ")[: cam_intrinsic.height * cam_intrinsic.width],
+                )
+            )
+        )
         # depth_data = depth_data.reshape((480, 640))
 
         scale = 100  # from cm to m
-        points[:, 2] = depth_data / np.sqrt(x_modifier ** 2 + y_modifier ** 2 + 1) / scale
+        points[:, 2] = (
+            depth_data / np.sqrt(x_modifier**2 + y_modifier**2 + 1) / scale
+        )
         points[:, 0] = x_modifier * points[:, 2]
         points[:, 1] = y_modifier * points[:, 2]
 
