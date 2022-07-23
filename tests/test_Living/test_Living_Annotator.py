@@ -4,7 +4,7 @@ import pytest
 import config
 from annotators.AnnotatorImage import AnnotatorImage
 from pcdBuilders.PcdBuilderLiving import PcdBuilderLiving
-from tests.data_for_tests.Living import data_paths, true_data_to_check
+from tests.data_for_tests.Living import data_paths, ground_truth_data
 
 
 def test_num_annotated_planes():
@@ -13,7 +13,7 @@ def test_num_annotated_planes():
     pcd = pcd_b.build_pcd(data_paths.main_data_list[0], 0)
 
     planes = pcd.planes
-    assert len(planes) == len(true_data_to_check.planes_to_test_annotator)
+    assert len(planes) == len(ground_truth_data.planes_to_test_annotator)
 
 
 @pytest.mark.parametrize(
@@ -46,6 +46,6 @@ def test_planes(file_name, file_num, plane_num):
 
     plane_to_compare_1 = np.asarray(planes[plane_num].equation)
     plane_to_compare_2 = np.asarray(
-        true_data_to_check.planes_to_test_annotator[plane_num]
+        ground_truth_data.planes_to_test_annotator[plane_num]
     )
     np.testing.assert_almost_equal(plane_to_compare_1, plane_to_compare_2)

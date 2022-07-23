@@ -10,7 +10,7 @@ jobs:
 #      - uses: psf/black@stable
       - uses: browniebroke/pre-commit-autoupdate-action@main
       - name: commit
-        if: always()
+        if: failure()
         uses: peter-evans/create-pull-request@v3
         with:
           token: ${{ secrets.ACTIONS_TOKEN}}

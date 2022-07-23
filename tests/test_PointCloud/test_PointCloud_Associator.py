@@ -5,7 +5,7 @@ import numpy as np
 from annotators.AnnotatorPointCloud import AnnotatorPointCloud
 from associators.AssociatorFront import AssociatorFront
 from pcdBuilders.PcdBuilderPointCloud import PcdBuilderPointCloud
-from tests.data_for_tests.PointCloud.true_data_ro_check import associated_planes
+from tests.data_for_tests.PointCloud.ground_truth_data import associated_planes
 
 
 @pytest.mark.parametrize(
