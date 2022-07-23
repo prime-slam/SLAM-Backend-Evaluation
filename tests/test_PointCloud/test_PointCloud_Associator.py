@@ -38,6 +38,8 @@ def test_associated_planes(file_num, indx):
 
     associator = AssociatorFront()
     pcd_s = associator.associate(pcd_s)
-    np.testing.assert_almost_equal(
-        pcd_s[file_num].planes[indx].equation, associated_planes[file_num - 1][indx]
-    )
+    for plane in pcd_s[file_num].planes:
+        if plane.track == indx:
+            np.testing.assert_almost_equal(
+                plane.equation, associated_planes[file_num - 1][indx]
+            )
