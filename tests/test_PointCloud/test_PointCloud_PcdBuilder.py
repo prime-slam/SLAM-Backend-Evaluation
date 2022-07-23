@@ -1,11 +1,6 @@
 import numpy as np
 import open3d as o3d
 
-# import config
-# import tests_data_paths
-# from annotators.AnnotatorPointCloud import AnnotatorPointCloud
-# from main import create_main_and_annot_list
-# from pcdBuilders.PcdBuilderPointCloud import PcdBuilderPointCloud
 import config
 from tests.data_for_tests.PointCloud import data_paths
 from annotators.AnnotatorPointCloud import AnnotatorPointCloud

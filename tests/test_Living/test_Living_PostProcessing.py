@@ -6,6 +6,7 @@ from PostProcessing import PostProcessing
 from annotators.AnnotatorImage import AnnotatorImage
 from associators.AssociatorAnnot import AssociatorAnnot
 from pcdBuilders.PcdBuilderLiving import PcdBuilderLiving
+from tests.data_for_tests.Living.ground_truth_data import max_planes
 
 
 def test_post_processing():
@@ -23,5 +24,5 @@ def test_post_processing():
     max_tracks = post_processing.post_process(pcds)
 
     np.testing.assert_array_equal(
-        max_tracks[:4], [8, 13, 11, 3]
+        max_tracks[:4], max_planes
     )  # что-то решить с количеством плоскостей
