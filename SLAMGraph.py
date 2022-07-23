@@ -7,7 +7,6 @@ from dto.Pcd import Pcd
 
 
 class SLAMGraph:
-
     def __init__(self):
         self.graph = FGraph()
         self.graph_trajectory = []
@@ -17,19 +16,22 @@ class SLAMGraph:
         for pcd in pcd_s:
             real_indx = len(self.plane_index_to_real_index)
             for plane in pcd.planes:
-                if plane.track in needed_indices and plane.track not in self.plane_index_to_real_index:
+                if (
+                    plane.track in needed_indices
+                    and plane.track not in self.plane_index_to_real_index
+                ):
                     self.plane_index_to_real_index[plane.track] = real_indx
                     real_indx += 1
 
         for _ in self.plane_index_to_real_index:
-            self.graph.add_node_plane_4d(
-                np.array([1, 0, 0, 0]))
+            self.graph.add_node_plane_4d(np.array([1, 0, 0, 0]))
 
         for _ in pcd_s:
             next_node = self.graph.add_node_pose_3d(geometry.SE3())
             self.graph_trajectory.append(next_node)
-        self.graph.add_factor_1pose_3d(geometry.SE3(), self.graph_trajectory[0], 1e6 * np.identity(6))
-
+        self.graph.add_factor_1pose_3d(
+            geometry.SE3(), self.graph_trajectory[0], 1e6 * np.identity(6)
+        )
 
     def estimate_the_graph(self, pcd_s: list[Pcd], needed_indices: List[int]):
 
@@ -40,7 +42,9 @@ class SLAMGraph:
             for plane in pcd.planes:
                 if plane.track in needed_indices:
                     cur_indx = self.plane_index_to_real_index[plane.track]
-                    self.graph.add_factor_1pose_1plane_4d(plane.equation, self.graph_trajectory[i], cur_indx, w_z)
+                    self.graph.add_factor_1pose_1plane_4d(
+                        plane.equation, self.graph_trajectory[i], cur_indx, w_z
+                    )
 
         self.graph.solve(LM)
         graph_estimated_state = self.graph.get_estimated_state()

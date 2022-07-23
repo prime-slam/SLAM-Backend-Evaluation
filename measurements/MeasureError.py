@@ -5,10 +5,8 @@ import config
 from measurements import evaluate_ate, evaluate_rpe
 
 
-class MeasureError :
-    def __init__(self,
-                 ds_filename_gt: str,
-                 num_of_all_nodes: int):
+class MeasureError:
+    def __init__(self, ds_filename_gt: str, num_of_all_nodes: int):
         self.ds_filename_gt = ds_filename_gt
         self.num_of_all_nodes = num_of_all_nodes
 
@@ -63,26 +61,23 @@ class MeasureError :
 
     @staticmethod
     def make_a_string(timestamp, translation, rotation):
-        translation_str = ' '.join(str(e) for e in translation)
-        rotation_str = ' '.join(str(e) for e in rotation)
-        return str(timestamp) + ' ' + translation_str + ' ' + rotation_str
+        translation_str = " ".join(str(e) for e in translation)
+        rotation_str = " ".join(str(e) for e in rotation)
+        return str(timestamp) + " " + translation_str + " " + rotation_str
 
     def read_gt_matrices(self):
         in_file = open(self.ds_filename_gt).readlines()  # getting gt data
 
-        all_lines = filter(lambda line: (line != ''), in_file)
+        all_lines = filter(lambda line: (line != ""), in_file)
 
         array_with_lines = np.loadtxt(all_lines)
         gt_matrices = np.split(array_with_lines, self.num_of_all_nodes, axis=0)
         return gt_matrices
 
-    def measure_error(self,
-                      first_node: int,
-                      first_gt_node: int,
-                      graph_estimated_state):
+    def measure_error(self, first_node: int, first_gt_node: int, graph_estimated_state):
         num_of_nodes = self.num_of_all_nodes
 
-        file_to_write_gt = open(config.FILE_NAME_GT, 'w')
+        file_to_write_gt = open(config.FILE_NAME_GT, "w")
         file_to_read_gt = open(self.ds_filename_gt)
 
         bios = 0
@@ -95,17 +90,22 @@ class MeasureError :
         elif first_gt_node > 0:
             bios_gt = first_gt_node
 
-        for line in in_file[first_node - bios_gt:first_node + num_of_nodes - bios_gt - 1]:
+        for line in in_file[
+            first_node - bios_gt : first_node + num_of_nodes - bios_gt - 1
+        ]:
             file_to_write_gt.write(line)
         file_to_write_gt.close()
 
-        file_to_write_estimated = open(config.FILE_NAME_ESTIMATED, 'w')
+        file_to_write_estimated = open(config.FILE_NAME_ESTIMATED, "w")
 
-        estimated_matrices = graph_estimated_state[-num_of_nodes + bios:]
+        estimated_matrices = graph_estimated_state[-num_of_nodes + bios :]
         for i, matrix in enumerate(estimated_matrices):
-            data = self.make_a_string(first_node + i + bios, matrix[:3, 3],
-                                      self.rotation_matrix_to_quaternion(matrix[:3, :3]))
-            file_to_write_estimated.write(data + '\n')
+            data = self.make_a_string(
+                first_node + i + bios,
+                matrix[:3, 3],
+                self.rotation_matrix_to_quaternion(matrix[:3, :3]),
+            )
+            file_to_write_estimated.write(data + "\n")
         file_to_write_estimated.close()
 
         print("ate")
