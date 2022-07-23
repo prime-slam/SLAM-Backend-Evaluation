@@ -7,7 +7,6 @@ from dto.Pcd import Pcd
 
 
 class Associator(ABC):
-
     @staticmethod
     def array_to_string(array: np.array) -> str:
         channels = [str(num) for num in array]
