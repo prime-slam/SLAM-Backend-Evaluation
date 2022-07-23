@@ -18,10 +18,17 @@ class Visualisation :
         for j, plane in enumerate(pcd.planes):
             build_color_matrix[plane.plane_indices] = plane.color
 
+        reflection = np.asarray(
+            [[-1, 0, 0, 0],
+             [0, -1, 0, 0],
+             [0, 0, -1, 0],
+             [0, 0, 0, 1]]
+        )
+
         pc.colors = o3d.utility.Vector3dVector(build_color_matrix.astype(np.float64) / 255.0)
         for transform in transforms:
             pc = pc.transform(transform)
-
+        o3d.visualization.draw_geometries([pc.transform(reflection)])
 
         return pc
 

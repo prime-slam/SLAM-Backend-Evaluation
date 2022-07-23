@@ -14,7 +14,7 @@ def test_get_points_point_cloud():
 
     pcd_extracted = o3d.geometry.PointCloud.create_from_depth_image(
         depth=o3d.cpu.pybind.geometry.Image(
-            o3d.io.read_image("/tests/data_for_tests/Living/depth/0.png")
+            o3d.io.read_image(data_paths.main_data_list[0])
         ),
         intrinsic=o3d_camera.O3D_CAMERA,
         extrinsic=array(
@@ -31,9 +31,7 @@ def test_get_points_point_cloud():
 
     annot = AnnotatorImage(data_paths.annot_list)
     pcd_builder = PcdBuilderLiving(config.CAMERA_ICL, annot)
-    pcd_built = pcd_builder._get_points(
-        "C:\\work\\GitHub\\PointCloudsAndStuff\\tests\\test_Living\\0.png"
-    )
+    pcd_built = pcd_builder._get_points(data_paths.main_data_list[0])
     array_to_compare_2 = pcd_built.points
 
     np.testing.assert_almost_equal(array_to_compare_1, array_to_compare_2)

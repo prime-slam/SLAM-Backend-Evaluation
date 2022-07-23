@@ -10,7 +10,7 @@ from dto.Pcd import Pcd
 from pcdBuilders.PcdBuilder import PcdBuilder
 
 
-class PcdBuilderPointcloud(PcdBuilder):
+class PcdBuilderPointCloud(PcdBuilder):
     def __init__(self, camera: Camera, annot: AnnotatorPointCloud):
         super().__init__(camera, annot)
 
@@ -18,5 +18,3 @@ class PcdBuilderPointcloud(PcdBuilder):
         pc = o3d.io.read_point_cloud(depth_image_path)
 
         return Pcd(np.asarray(pc.points) / 1000)
-
-

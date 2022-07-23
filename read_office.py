@@ -81,12 +81,7 @@ def __get_camera_params_for_frame(depth_image):
 
 def getting_points(depth_frame_path, cam_intrinsic):
     # Adopted from https://www.doc.ic.ac.uk/~ahanda/VaFRIC/compute3Dpositions.m
-    fx, fy, cx, cy = (
-        cam_intrinsic.focal_x,
-        cam_intrinsic.focal_y,
-        cam_intrinsic.cx,
-        cam_intrinsic.cy,
-    )
+    fx, fy, cx, cy = __get_camera_params_for_frame(depth_frame_path)
 
     x_matrix = np.tile(
         np.arange(cam_intrinsic.width), (cam_intrinsic.height, 1)

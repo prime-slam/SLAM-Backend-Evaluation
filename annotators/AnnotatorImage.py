@@ -18,10 +18,14 @@ class AnnotatorImage(Annotator):
         colors_reshaped = matrix_colors.reshape(-1, matrix_colors.shape[2])
         colors_unique = np.unique(colors_reshaped, axis=0)
 
-        unique_colors_without_black = list(filter(lambda x: (x != [0, 0, 0]).all(axis=0), colors_unique))
+        unique_colors_without_black = list(
+            filter(lambda x: (x != [0, 0, 0]).all(axis=0), colors_unique)
+        )
         for color in unique_colors_without_black:
             indices = np.where((colors_reshaped == color).all(axis=1))[0]
             plane_points = pcd.points[indices]
-            plane = Plane(Plane.get_normal(plane_points), track=-1, color=color, indices=indices)
+            equation = Plane.get_normal(plane_points)
+            plane = Plane(equation, track=-1, color=color, indices=indices)
             planes_of_image.append((plane))
+
         return planes_of_image

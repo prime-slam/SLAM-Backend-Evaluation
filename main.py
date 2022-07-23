@@ -2,25 +2,40 @@ import argparse
 import os
 import open3d as o3d
 
+
 import config
+import read_office
 from SLAMGraph import SLAMGraph
 from annotators.AnnotatorImage import AnnotatorImage
 from annotators.AnnotatorPointCloud import AnnotatorPointCloud
 from associators.AssociatorAnnot import AssociatorAnnot
 from associators.AssociatorFront import AssociatorFront
+from dto.Pcd import Pcd
 from measurements.MeasureError import MeasureError
 from pcdBuilders.PcdBuilderLiving import PcdBuilderLiving
 from pcdBuilders.PcdBuilderOffice import PcdBuilderOffice
-from pcdBuilders.PcdBuilderPointCloud import PcdBuilderPointcloud
+from pcdBuilders.PcdBuilderPointCloud import PcdBuilderPointCloud
 from PostProcessing import PostProcessing
 from Visualisation import Visualisation
 
 
-def create_data_list_image(main_data_path: str):
+def create_data_list_living(main_data_path: str):
     depth = os.listdir(main_data_path)
     depth = sorted(depth, key=lambda x: int(x[:-4]))
     main_data_list = list(map(lambda x: os.path.join(main_data_path, x), depth))
     return main_data_list
+
+
+def create_annot_list_office(main_data_path: str):
+    depth = os.listdir(main_data_path)
+    depth = sorted(depth, key=lambda x: int(x[9:-4]))
+    main_data_list = list(map(lambda x: os.path.join(main_data_path, x), depth))
+    return main_data_list
+
+
+def create_main_lists_office(main_data_path: str):
+    png_files, depths_files = read_office.provide_filenames(main_data_path)
+    return png_files, depths_files
 
 
 def create_main_and_annot_list(main_data_path: str):
@@ -41,22 +56,33 @@ def create_main_and_annot_list(main_data_path: str):
     return annot_list, main_data_list
 
 
-def main(main_data_path: str,
-         annot_path: str,
-         which_format: int,
-         first_node: int,
-         first_gt_node: int,
-         num_of_nodes: int,
-         ds_filename_gt: str):
+def main(
+    main_data_path: str,
+    annot_path: str,
+    which_format: int,
+    first_node: int,
+    first_gt_node: int,
+    num_of_nodes: int,
+    ds_filename_gt: str,
+):
 
     camera = config.CAMERA_ICL
     pcds = []
 
     if which_format == 1 or which_format == 2:
-
-        main_data_list = create_data_list_image(main_data_path)[first_node: first_node + num_of_nodes]
-        annot_list = create_data_list_image(annot_path)[first_node: first_node + num_of_nodes]
-
+        if which_format == 1:
+            main_data_list = create_data_list_living(main_data_path)[
+                first_node : first_node + num_of_nodes
+            ]
+            annot_list = create_data_list_living(annot_path)[
+                first_node : first_node + num_of_nodes
+            ]
+        else:
+            annot_list = create_annot_list_office(annot_path)
+            png_list, main_data_list = create_main_lists_office(main_data_path)
+            png_list = png_list[first_node : first_node + num_of_nodes]
+            main_data_list = main_data_list[first_node : first_node + num_of_nodes]
+            print(main_data_list)
         annot = AnnotatorImage(annot_list)
         if which_format == 1:
             pcd_b = PcdBuilderLiving(camera, annot)
@@ -71,11 +97,11 @@ def main(main_data_path: str,
 
     else:
         annot_list, main_data_list = create_main_and_annot_list(main_data_path)
-        annot_list = annot_list[first_node: first_node + num_of_nodes]
-        main_data_list = main_data_list[first_node: first_node + num_of_nodes]
+        annot_list = annot_list[first_node : first_node + num_of_nodes]
+        main_data_list = main_data_list[first_node : first_node + num_of_nodes]
 
         annot = AnnotatorPointCloud(annot_list)
-        pcd_b = PcdBuilderPointcloud(camera, annot)
+        pcd_b = PcdBuilderPointCloud(camera, annot)
 
         for i, file in enumerate(annot_list):
             pcds.append(pcd_b.build_pcd(main_data_list[i], i))
@@ -85,35 +111,52 @@ def main(main_data_path: str,
 
     post_processing = PostProcessing()
     max_tracks = post_processing.post_process(pcds)
+    print(max_tracks)
 
     slam_graph = SLAMGraph()
     graph_estimated_state = slam_graph.estimate_the_graph(pcds, max_tracks)
 
-    measure_error = MeasureError(ds_filename_gt,
-                                 len(annot_list))
+    measure_error = MeasureError(ds_filename_gt, len(annot_list))
     measure_error.measure_error(first_node, first_gt_node, graph_estimated_state)
 
     visualisation = Visualisation(graph_estimated_state)
     visualisation.visualisation(pcds, graph_estimated_state)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
 
-    parser = argparse.ArgumentParser(description='Build a trajectory')
-    parser.add_argument('main_data', type=str, help='Directory where main information files are stored')
-    parser.add_argument('annot', type=str, help='Directory where color images are stored')
-    parser.add_argument('which_format', type=int, choices=[1, 2, 3], help='living room = 1, office = 2, point clouds = 3')
-    parser.add_argument('first_node', type=int, help='from what node algorithm should start')
-    parser.add_argument('first_gt_node', type=int, help='From what node gt references start')
-    parser.add_argument('num_of_nodes', type=int, help='Number of needed nodes')
-    parser.add_argument('ds_filename_gt', type=str, help='Filename of a file with gt references')
+    parser = argparse.ArgumentParser(description="Build a trajectory")
+    parser.add_argument(
+        "main_data", type=str, help="Directory where main information files are stored"
+    )
+    parser.add_argument(
+        "annot", type=str, help="Directory where color images are stored"
+    )
+    parser.add_argument(
+        "which_format",
+        type=int,
+        choices=[1, 2, 3],
+        help="living room = 1, office = 2, point clouds = 3",
+    )
+    parser.add_argument(
+        "first_node", type=int, help="from what node algorithm should start"
+    )
+    parser.add_argument(
+        "first_gt_node", type=int, help="From what node gt references start"
+    )
+    parser.add_argument("num_of_nodes", type=int, help="Number of needed nodes")
+    parser.add_argument(
+        "ds_filename_gt", type=str, help="Filename of a file with gt references"
+    )
 
     args = parser.parse_args()
 
-    main(args.main_data,
-         args.annot,
-         args.which_format,
-         args.first_node,
-         args.first_gt_node,
-         args.num_of_nodes,
-         args.ds_filename_gt)
+    main(
+        args.main_data,
+        args.annot,
+        args.which_format,
+        args.first_node,
+        args.first_gt_node,
+        args.num_of_nodes,
+        args.ds_filename_gt,
+    )
