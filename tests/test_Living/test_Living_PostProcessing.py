@@ -23,6 +23,4 @@ def test_post_processing():
     post_processing = PostProcessing()
     max_tracks = post_processing.post_process(pcds)
 
-    np.testing.assert_array_equal(
-        max_tracks[:4], max_planes
-    )  # что-то решить с количеством плоскостей
+    np.testing.assert_array_equal(max_tracks[:4], max_planes)

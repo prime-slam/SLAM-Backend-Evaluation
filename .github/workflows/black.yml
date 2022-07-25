@@ -7,7 +7,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-#      - uses: psf/black@stable
       - uses: browniebroke/pre-commit-autoupdate-action@main
       - name: commit
         if: failure()
@@ -15,7 +14,7 @@ jobs:
         with:
           token: ${{ secrets.ACTIONS_TOKEN}}
           branch: update/pre-commit-hooks
-          title: Update pre-commit hooks
-          commit-message: "chore: update pre-commit hooks"
+          title: Fixing black
+          commit-message: "chore: fixing black"
           body: Update versions of pre-commit hooks to latest version.
           base: ${{ github.head_ref }}
