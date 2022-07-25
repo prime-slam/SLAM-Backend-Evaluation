@@ -111,7 +111,6 @@ def main(
 
     post_processing = PostProcessing()
     max_tracks = post_processing.post_process(pcds)
-    print(max_tracks)
 
     slam_graph = SLAMGraph()
     graph_estimated_state = slam_graph.estimate_the_graph(pcds, max_tracks)

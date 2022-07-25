@@ -13,8 +13,8 @@ jobs:
         uses: peter-evans/create-pull-request@v3
         with:
           token: ${{ secrets.ACTIONS_TOKEN}}
-          branch: update/pre-commit-hooks
+          branch: branch_to_fix_black
           title: Fixing black
           commit-message: "chore: fixing black"
-          body: Update versions of pre-commit hooks to latest version.
+          body: Applying requested changes.
           base: ${{ github.head_ref }}

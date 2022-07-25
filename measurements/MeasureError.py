@@ -1,4 +1,6 @@
 import math
+import os
+
 import numpy as np
 
 import config
@@ -77,7 +79,8 @@ class MeasureError:
     def measure_error(self, first_node: int, first_gt_node: int, graph_estimated_state):
         num_of_nodes = self.num_of_all_nodes
 
-        file_to_write_gt = open(config.FILE_NAME_GT, "w")
+        gt_file_path = "measure_error_gt.txt"
+        file_to_write_gt = open(gt_file_path, "w")
         file_to_read_gt = open(self.ds_filename_gt)
 
         bios = 0
@@ -95,8 +98,8 @@ class MeasureError:
         ]:
             file_to_write_gt.write(line)
         file_to_write_gt.close()
-
-        file_to_write_estimated = open(config.FILE_NAME_ESTIMATED, "w")
+        estimated_file_path = "measure_error_estimated.txt"
+        file_to_write_estimated = open(estimated_file_path, "w")
 
         estimated_matrices = graph_estimated_state[-num_of_nodes + bios :]
         for i, matrix in enumerate(estimated_matrices):
@@ -109,6 +112,9 @@ class MeasureError:
         file_to_write_estimated.close()
 
         print("ate")
-        evaluate_ate.main(config.FILE_NAME_GT, config.FILE_NAME_ESTIMATED)
+        evaluate_ate.main(gt_file_path, estimated_file_path)
         print("rpe")
-        evaluate_rpe.main(config.FILE_NAME_GT, config.FILE_NAME_ESTIMATED)
+        evaluate_rpe.main(gt_file_path, estimated_file_path)
+
+        os.remove(gt_file_path)
+        os.remove(estimated_file_path)

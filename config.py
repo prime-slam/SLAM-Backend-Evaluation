@@ -10,5 +10,3 @@ CAMERA_ICL = Camera(
     scale=5000,
 )
 MAX_PLANES_COUNT = 6
-FILE_NAME_ESTIMATED = "./measurements_files/measure_error_estimated.txt"
-FILE_NAME_GT = "./measurements_files/measure_error_gt.txt"

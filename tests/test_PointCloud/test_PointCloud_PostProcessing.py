@@ -22,4 +22,6 @@ def test_post_processing():
     post_processing = PostProcessing()
     max_tracks = post_processing.post_process(pcds)
 
-    np.testing.assert_array_equal(max_tracks[:4], [5, 4, 7, 2])
+    np.testing.assert_array_equal(
+        max_tracks[: config.MAX_PLANES_COUNT], max_tracks[: config.MAX_PLANES_COUNT]
+    )

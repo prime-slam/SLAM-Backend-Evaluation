@@ -18,6 +18,5 @@ class AssociatorAnnot(Associator):
                     ] = plane.track  # append (color:index) to map with the next index
                 else:
                     plane.track = self.__color_to_indx[color_str]
-        print(self.__color_to_indx)
 
         return pcd_s
