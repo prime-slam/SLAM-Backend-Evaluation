@@ -14,7 +14,7 @@ PcdBuilderOffice - builds pcd from .depth file, uses pinhole camera parameters
 
 PcdBuilderLiving - builds pcd from depth image, uses pinhole camera parameters
 
-### Abstract class Annotator: 
+### Abstract class Annotator:
 extracts planes from annotation
 
 ### Subclasses:
@@ -23,15 +23,15 @@ AnnotatorImage - extracts planes from annotation in rgb format
 
 AnnotatorPointCloud - extracts planes from annotation in .npy format
 
-### Abstract class Associator: 
+### Abstract class Associator:
 gets correct indices for planes of each image
 
 ### Subclasses:
 
 
-AssociatorAnnot - associates planes with annotation 
+AssociatorAnnot - associates planes with annotation
 
-AssociatorFront - associates planes with associate_front function with frontend data  
+AssociatorFront - associates planes with associate_front function with frontend data
 
 ### class PostProcessing:
 chooses planes with maximum points
@@ -44,6 +44,3 @@ evaluates ate and rpe errors with TUM scripts for evaluating
 
 ### class Visualisation:
 visualises work of the algorithm as a PointCloud object of open3d library
-
-
-
