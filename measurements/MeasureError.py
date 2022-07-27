@@ -3,7 +3,6 @@ import os
 
 import numpy as np
 
-import config
 from measurements import evaluate_ate, evaluate_rpe
 
 
@@ -11,9 +10,15 @@ class MeasureError:
     def __init__(self, ds_filename_gt: str, num_of_all_nodes: int):
         self.ds_filename_gt = ds_filename_gt
         self.num_of_all_nodes = num_of_all_nodes
+        self.__file_to_write_estimated = "measure_error_estimated.txt"
+        self.__file_to_write_gt = "measure_error_gt.txt"
 
     @staticmethod
     def rotation_matrix_to_quaternion(r_matrix):
+        """
+        :param r_matrix: rotation as a matrix
+        :return: rotation as a quaternion
+        """
         # First row of the rotation matrix
         r00 = r_matrix[0, 0]
         r01 = r_matrix[0, 1]
@@ -63,11 +68,20 @@ class MeasureError:
 
     @staticmethod
     def make_a_string(timestamp, translation, rotation):
+        """
+        :param timestamp: timestamp
+        :param translation: translation as a vector
+        :param rotation: rotation as a quaternion
+        :return: string of a concatenated params
+        """
         translation_str = " ".join(str(e) for e in translation)
         rotation_str = " ".join(str(e) for e in rotation)
         return str(timestamp) + " " + translation_str + " " + rotation_str
 
     def read_gt_matrices(self):
+        """
+        :return: array of splited matrices
+        """
         in_file = open(self.ds_filename_gt).readlines()  # getting gt data
 
         all_lines = filter(lambda line: (line != ""), in_file)
@@ -77,10 +91,15 @@ class MeasureError:
         return gt_matrices
 
     def measure_error(self, first_node: int, first_gt_node: int, graph_estimated_state):
+        """
+        :param first_node: first node of data sequence
+        :param first_gt_node: first node of ground truth sequence
+        :param graph_estimated_state: estimated graph
+        :return: writes measured errors
+        """
         num_of_nodes = self.num_of_all_nodes
 
-        gt_file_path = "measure_error_gt.txt"
-        file_to_write_gt = open(gt_file_path, "w")
+        file_to_write_gt = open(self.__file_to_write_gt, "w")
         file_to_read_gt = open(self.ds_filename_gt)
 
         bios = 0
@@ -98,8 +117,8 @@ class MeasureError:
         ]:
             file_to_write_gt.write(line)
         file_to_write_gt.close()
-        estimated_file_path = "measure_error_estimated.txt"
-        file_to_write_estimated = open(estimated_file_path, "w")
+
+        file_to_write_estimated = open(self.__file_to_write_estimated, "w")
 
         estimated_matrices = graph_estimated_state[-num_of_nodes + bios :]
         for i, matrix in enumerate(estimated_matrices):
@@ -112,9 +131,9 @@ class MeasureError:
         file_to_write_estimated.close()
 
         print("ate")
-        evaluate_ate.main(gt_file_path, estimated_file_path)
+        evaluate_ate.main(self.__file_to_write_gt, self.__file_to_write_estimated)
         print("rpe")
-        evaluate_rpe.main(gt_file_path, estimated_file_path)
+        evaluate_rpe.main(self.__file_to_write_gt, self.__file_to_write_estimated)
 
-        os.remove(gt_file_path)
-        os.remove(estimated_file_path)
+        os.remove(self.__file_to_write_gt)
+        os.remove(self.__file_to_write_estimated)

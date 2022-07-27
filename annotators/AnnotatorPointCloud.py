@@ -22,7 +22,7 @@ class AnnotatorPointCloud(Annotator):
 
             plane_points = pcd.points[indices]
 
-            equation = Plane.get_normal(plane_points)
+            equation = Plane.get_equation(plane_points)
             equations.append(equation)
 
             plane = Plane(

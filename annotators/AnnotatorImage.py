@@ -24,7 +24,7 @@ class AnnotatorImage(Annotator):
         for color in unique_colors_without_black:
             indices = np.where((colors_reshaped == color).all(axis=1))[0]
             plane_points = pcd.points[indices]
-            equation = Plane.get_normal(plane_points)
+            equation = Plane.get_equation(plane_points)
             plane = Plane(equation, track=-1, color=color, indices=indices)
             planes_of_image.append((plane))
 

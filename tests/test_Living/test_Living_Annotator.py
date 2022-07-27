@@ -26,7 +26,7 @@ def test_num_annotated_planes(file_num):
 
 list_of_params_0 = [[0, i] for i in range(16)]
 list_of_params_1 = [[1, m] for m in range(17)]
-list_of_params_2 = [[1, n] for n in range(17)]
+list_of_params_2 = [[2, n] for n in range(17)]
 list_of_params = list_of_params_0 + list_of_params_1 + list_of_params_2
 
 

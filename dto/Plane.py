@@ -9,7 +9,11 @@ class Plane:
         self.plane_indices = indices
 
     @staticmethod
-    def get_normal(points):
+    def get_equation(points):
+        """
+        :param points: all points of a plane
+        :return: equation of a plane
+        """
         c = np.mean(points, axis=0)
         A = np.array(points) - c
         eigvals, eigvects = np.linalg.eig(A.T @ A)
