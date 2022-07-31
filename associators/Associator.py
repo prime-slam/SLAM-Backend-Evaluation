@@ -7,11 +7,15 @@ from dto.Pcd import Pcd
 
 
 class Associator(ABC):
+    """
+    Gets correct indices for planes of each image
+    """
+
     @staticmethod
     def array_to_string(array: np.array) -> str:
         """
-        :param array: array of ints
-        :return: string with "#" as a separator between the numbers
+        :param array: array to convert to str
+        :return: string with "#" as a separator between the array items
         """
         channels = [str(num) for num in array]
         string = "#".join(channels)

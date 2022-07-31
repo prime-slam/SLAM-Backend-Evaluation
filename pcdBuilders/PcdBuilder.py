@@ -4,6 +4,12 @@ from dto.Pcd import Pcd
 
 
 class PcdBuilder(ABC):
+    """
+    Loads point cloud from main data file and Annotator object
+    :attribute cam: pin hole camera parameters
+    :attribute _annot: annotator object to extract planes
+    """
+
     def __init__(self, camera: Camera, annot):
         self.cam = camera
         self._annot = annot

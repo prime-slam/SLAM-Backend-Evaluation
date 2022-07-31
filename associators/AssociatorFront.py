@@ -7,6 +7,11 @@ import numpy as np
 
 
 class AssociatorFront(Associator):
+    """
+    Associates planes with associate_front function with frontend data
+    :attribute __set_of_generated_colors: set of used plane colors in order not to allign one color to two different planes
+    """
+
     def __init__(self, set_of_generated_colors=set()):
         self.__set_of_generated_colors = set_of_generated_colors
 
@@ -20,9 +25,7 @@ class AssociatorFront(Associator):
 
     def associate(self, pcd_s: List[Pcd]):
         indx = 0
-        for i, prev_pcd in enumerate(
-            pcd_s[:-1]
-        ):  # циклом идем по всем парам последовательных кадров, для каждой
+        for i, prev_pcd in enumerate(pcd_s[:-1]):
             cur_pcd = pcd_s[i + 1]
 
             if prev_pcd.planes[0].track == -1:
@@ -37,47 +40,34 @@ class AssociatorFront(Associator):
 
             for cur_plane in cur_pcd.planes:
                 for prev_plane in prev_pcd.planes:
-                    cur_pair = (prev_plane, cur_plane)  # создаем пары:
-                    # (плоскость из предыдущего кадра,
-                    # плоскость из текущего кадра)
+                    cur_pair = (prev_plane, cur_plane)  # creating pairs:
+                    # (plane from current image,
+                    # plane from previous image)
                     deviation = np.dot(
                         prev_plane.equation[:3], cur_plane.equation[:3]
-                    )  # косинус угла: наибольший, когда плоскости совпадают
+                    )  # cos of an angle: the biggest when planes have the same normal
                     bias = (
                         math.acos(deviation)
                         + math.fabs(prev_plane.equation[-1] - cur_plane.equation[-1])
                         * 10
                     )
-                    map_best_bias[cur_pair] = bias  # Каждой паре сопоставляем bias
-            sorted_map = sorted(
-                map_best_bias.items(), key=lambda item: item[1]
-            )  # сортируем карту по возрастанию
+                    map_best_bias[cur_pair] = bias
+            sorted_map = sorted(map_best_bias.items(), key=lambda item: item[1])
             for pair, bias in sorted_map:
-                if bias > min_bias:  # исключаем случаи,
-                    # когда bias больше заданного трэшхолда
+                if bias > min_bias:
                     break
                 prev_plane, cur_plane = pair
                 diff = len(prev_plane.plane_indices) / len(cur_plane.plane_indices)
-                if diff < 0.5 or diff > 2:  # исключаем случаи, в которых плоскости
-                    # отличаются больше, чем в два раза
+                if diff < 0.5 or diff > 2:
                     continue
 
                 if prev_plane.track in set_prev_used or cur_plane.track != -1:
-                    # исключаем случаи, в которых одна
-                    # из плоскостей была ассоциирована до этого
-
                     continue
-                cur_plane.track = (
-                    prev_plane.track
-                )  # записываем плоскость из предыдущего кадра в сет,
-                # плоскости из текущего кадра присваиваем
-                # соответствующий индекс и цвет
+                cur_plane.track = prev_plane.track
                 cur_plane.color = prev_plane.color
                 set_prev_used.add(prev_plane.track)
             for plane in cur_pcd.planes:
-                if (
-                    plane.track == -1
-                ):  # если плоскость не была распознана, индексируем ее как новую
+                if plane.track == -1:
                     plane.track = indx
                     indx += 1
                     plane.color = self.__generate_color()

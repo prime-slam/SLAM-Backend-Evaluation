@@ -7,6 +7,10 @@ import numpy as np
 
 
 class AnnotatorPointCloud(Annotator):
+    """
+    Extracts planes from annotation in .npy format
+    """
+
     def __init__(self, array_path_annot: List[str]):
         super().__init__(array_path_annot)
 

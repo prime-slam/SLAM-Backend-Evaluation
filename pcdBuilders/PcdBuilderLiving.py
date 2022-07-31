@@ -10,6 +10,10 @@ from pcdBuilders.PcdBuilder import PcdBuilder
 
 
 class PcdBuilderLiving(PcdBuilder):
+    """
+    Builds pcd from depth image, uses pinhole camera parameters
+    """
+
     def __init__(self, camera: Camera, annot: AnnotatorImage):
         super().__init__(camera, annot)
 

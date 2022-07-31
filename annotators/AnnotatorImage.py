@@ -8,6 +8,10 @@ from annotators.Annotator import Annotator
 
 
 class AnnotatorImage(Annotator):
+    """
+    Extracts planes from annotation in rgb format
+    """
+
     def __init__(self, array_path_annot: List[str]):
         super().__init__(array_path_annot)
 

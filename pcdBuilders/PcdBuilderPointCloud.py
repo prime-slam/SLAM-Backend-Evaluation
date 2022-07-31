@@ -11,6 +11,10 @@ from pcdBuilders.PcdBuilder import PcdBuilder
 
 
 class PcdBuilderPointCloud(PcdBuilder):
+    """
+    Builds pcd from .pcd and .npy files
+    """
+
     def __init__(self, camera: Camera, annot: AnnotatorPointCloud):
         super().__init__(camera, annot)
 

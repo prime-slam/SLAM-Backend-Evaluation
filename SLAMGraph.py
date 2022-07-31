@@ -7,6 +7,13 @@ from dto.Pcd import Pcd
 
 
 class SLAMGraph:
+    """
+    Builds and estimtates the SLAM graph
+    :attribute graph: object of a factor graph
+    :attribute graph_trajectory: calculated trajectory of a system
+    :attribute plane_index_to_real_index: map to match plane index and index used by the algorithm
+    """
+
     def __init__(self):
         self.graph = FGraph()
         self.graph_trajectory = []
@@ -49,4 +56,4 @@ class SLAMGraph:
         self.graph.solve(LM)
         graph_estimated_state = self.graph.get_estimated_state()
 
-        return graph_estimated_state
+        return graph_estimated_st

@@ -1,49 +1,19 @@
 # SLAMBackendAlgos
 
-A Project for benchmarking existing SLAM algorithms on planes dataset
+A Project for benchmarking existing SLAM algorithms on planes dataset. 
+Benchmarking is done on an example of two TUM datasets: 
+office and living room with respect to given ground truth trajectories. An aim of the project is to evaluate ate and rpe
+errors on both pre-annotated and frontend processed datasets, find key differences in the results and give minimum 
+requirements to the frontend algorithm.
 
-# Implemented classes
-### Abstract class PcdBuilder:
-loads point cloud from main data file and Annotator object
-
-### Subclasses:
-
-PcdBuilderPointCloud  - builds pcd from .pcd and .npy files
-
-PcdBuilderOffice - builds pcd from .depth file, uses pinhole camera parameters
-
-PcdBuilderLiving - builds pcd from depth image, uses pinhole camera parameters
-
-### Abstract class Annotator: 
-extracts planes from annotation
-
-### Subclasses:
-
-AnnotatorImage - extracts planes from annotation in rgb format
-
-AnnotatorPointCloud - extracts planes from annotation in .npy format
-
-### Abstract class Associator: 
-gets correct indices for planes of each image
-
-### Subclasses:
+# Example of usage
+```python
+python main.py C:\path_to_depth_images C:\path_to_color_images 1 0 1 3 C:\path_to_file_with_ground_truth
+```
+ 
 
 
-AssociatorAnnot - associates planes with annotation 
 
-AssociatorFront - associates planes with associate_front function with frontend data  
-
-### class PostProcessing:
-chooses planes with maximum points
-
-### class SLAMGraph:
-builds and estimtates the SLAM graph
-
-### class MeasureError:
-evaluates ate and rpe errors with TUM scripts for evaluating
-
-### class Visualisation:
-visualises work of the algorithm as a PointCloud object of open3d library
 
 
 

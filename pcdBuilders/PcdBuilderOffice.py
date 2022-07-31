@@ -7,6 +7,10 @@ from pcdBuilders.PcdBuilder import PcdBuilder
 
 
 class PcdBuilderOffice(PcdBuilder):
+    """
+    Builds pcd from .depth file, uses pinhole camera parameters
+    """
+
     def __init__(
         self,
         camera: Camera,

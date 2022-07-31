@@ -2,6 +2,14 @@ import numpy as np
 
 
 class Plane:
+    """
+    A class to represent a plane
+    :attribute equation: equation of a plane
+    :attribute track: track of a plane
+    :attribute color: color to use on planes of this track
+    :attribute plane_indices: indices of points that belong to a plane
+    """
+
     def __init__(self, equation, track: int, color, indices):
         self.equation = equation
         self.track = track

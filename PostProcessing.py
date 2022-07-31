@@ -5,6 +5,10 @@ from dto.Pcd import Pcd
 
 
 class PostProcessing:
+    """
+    Chooses planes with maximum points
+    """
+
     def __get_best_planes(self, pcd_s: List[Pcd]):
         indx_to_max_num_points = {}
         for i, pcd in enumerate(pcd_s):
