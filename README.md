@@ -6,11 +6,7 @@ office and living room with respect to given ground truth trajectories. An aim o
 errors on both pre-annotated and frontend processed datasets, find key differences in the results and give minimum 
 requirements to the frontend algorithm.
 
-# Example of usage
-```python
-python main.py C:\path_to_depth_images C:\path_to_color_images 1 0 1 3 C:\path_to_file_with_ground_truth
-```
- 
+
 
 
 
