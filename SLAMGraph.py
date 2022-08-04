@@ -56,4 +56,4 @@ class SLAMGraph:
         self.graph.solve(LM)
         graph_estimated_state = self.graph.get_estimated_state()
 
-        return graph_estimated_st
+        return graph_estimated_state

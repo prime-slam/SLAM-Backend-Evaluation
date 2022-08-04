@@ -124,7 +124,9 @@ def main(
 
 if __name__ == "__main__":
 
-    parser = argparse.ArgumentParser(description="Build a trajectory")
+    parser = argparse.ArgumentParser(
+        description="Benchmarks a trajectory, built by an algorithm"
+    )
     parser.add_argument(
         "main_data", type=str, help="Directory where main information files are stored"
     )
@@ -138,7 +140,7 @@ if __name__ == "__main__":
         help="living room = 1, office = 2, point clouds = 3",
     )
     parser.add_argument(
-        "first_node", type=int, help="from what node algorithm should start"
+        "first_node", type=int, help="From what node algorithm should start"
     )
     parser.add_argument(
         "first_gt_node", type=int, help="From what node gt references start"
