@@ -1,9 +1,9 @@
 import numpy as np
 import pytest
 
-import config
-from annotators.AnnotatorImage import AnnotatorImage
-from pcdBuilders.PcdBuilderLiving import PcdBuilderLiving
+from scripts import config
+from scripts.annotators.AnnotatorImage import AnnotatorImage
+from scripts.pcdBuilders.PcdBuilderLiving import PcdBuilderLiving
 from tests.data_for_tests.Living import data_paths, ground_truth_data
 
 

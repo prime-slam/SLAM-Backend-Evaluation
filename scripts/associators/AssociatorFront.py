@@ -1,9 +1,9 @@
-import math
 from typing import List
-from dto.Pcd import Pcd
-from associators.Associator import Associator
+from scripts.dto.Pcd import Pcd
+from scripts.associators.Associator import Associator
 
 import numpy as np
+import math
 
 
 class AssociatorFront(Associator):
@@ -58,7 +58,13 @@ class AssociatorFront(Associator):
                     break
                 prev_plane, cur_plane = pair
                 diff = len(prev_plane.plane_indices) / len(cur_plane.plane_indices)
-                if diff < 0.5 or diff > 2:
+                lower_bound, upper_bound = (
+                    0.5,
+                    2,
+                )
+                # plane`s size cannot become less than lower_bound and greater than upper_bound
+                # between two sequential files
+                if diff < lower_bound or diff > upper_bound:
                     continue
 
                 if prev_plane.track in set_prev_used or cur_plane.track != -1:

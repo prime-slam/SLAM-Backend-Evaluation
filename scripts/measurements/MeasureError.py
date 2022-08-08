@@ -1,9 +1,8 @@
 import math
 import os
-
 import numpy as np
 
-from measurements import evaluate_ate, evaluate_rpe
+from scripts.measurements import evaluate_ate, evaluate_rpe
 
 
 class MeasureError:
@@ -56,7 +55,6 @@ class MeasureError:
             qx = 0.25 * s
             qy = (r01 + r10) / s
             qz = (r02 + r20) / s
-
         elif r11 > r22:
             s = math.sqrt(1.0 + r11 - r00 - r22) * 2
             qw = (r02 - r20) / s
@@ -114,6 +112,7 @@ class MeasureError:
         bios_gt = 0
 
         in_file = file_to_read_gt.readlines()  # mind the first timestamp
+        file_to_read_gt.close()
 
         if first_node == 0 and first_gt_node > 0:
             bios = first_gt_node

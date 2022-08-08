@@ -2,10 +2,10 @@ import numpy as np
 import open3d as o3d
 import pytest
 
-import config
+from scripts import config
 from tests.data_for_tests.PointCloud import data_paths
-from annotators.AnnotatorPointCloud import AnnotatorPointCloud
-from pcdBuilders.PcdBuilderPointCloud import PcdBuilderPointCloud
+from scripts.annotators.AnnotatorPointCloud import AnnotatorPointCloud
+from scripts.pcdBuilders.PcdBuilderPointCloud import PcdBuilderPointCloud
 
 
 @pytest.mark.parametrize("file_num", [0, 1, 2])

@@ -1,10 +1,9 @@
 from typing import List
+from scripts.dto.Plane import Plane
+from scripts.annotators.Annotator import Annotator
 
 import cv2
 import numpy as np
-
-from dto.Plane import Plane
-from annotators.Annotator import Annotator
 
 
 class AnnotatorImage(Annotator):

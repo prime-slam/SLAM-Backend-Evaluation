@@ -1,7 +1,7 @@
-from typing import List
-
 import config
+
 from dto.Pcd import Pcd
+from typing import List
 
 
 class PostProcessing:
@@ -9,7 +9,12 @@ class PostProcessing:
     Chooses planes with maximum points
     """
 
-    def __get_best_planes(self, pcd_s: List[Pcd]):
+    @staticmethod
+    def post_process(pcd_s: List[Pcd]):
+        """
+        :param pcd_s: list of pcd objects
+        :return: indices of planes with maximum points
+        """
         indx_to_max_num_points = {}
         for i, pcd in enumerate(pcd_s):
             print("postprocessing " + str(i))
@@ -24,9 +29,4 @@ class PostProcessing:
             indx_to_max_num_points, key=indx_to_max_num_points.get
         )
 
-        return map_indx_to_max_num_points
-
-    def post_process(self, pcd_s: List[Pcd]):
-        max_planes = self.__get_best_planes(pcd_s)[-config.MAX_PLANES_COUNT :]
-
-        return max_planes
+        return map_indx_to_max_num_points[-config.MAX_PLANES_COUNT :]

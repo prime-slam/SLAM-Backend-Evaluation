@@ -1,6 +1,6 @@
 from typing import List
-from dto.Pcd import Pcd
-from associators.Associator import Associator
+from scripts.dto.Pcd import Pcd
+from scripts.associators.Associator import Associator
 
 
 class AssociatorAnnot(Associator):

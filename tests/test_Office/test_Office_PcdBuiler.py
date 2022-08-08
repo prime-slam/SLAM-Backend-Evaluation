@@ -1,11 +1,10 @@
 import numpy as np
-from numpy import array
-from open3d.cpu import pybind
 
-import config
+from scripts import config
 import open3d as o3d
-from annotators.AnnotatorImage import AnnotatorImage
-from pcdBuilders.PcdBuilderOffice import PcdBuilderOffice
+
+from scripts.annotators.AnnotatorImage import AnnotatorImage
+from scripts.pcdBuilders.PcdBuilderOffice import PcdBuilderOffice
 from tests.data_for_tests.Office import data_paths
 
 

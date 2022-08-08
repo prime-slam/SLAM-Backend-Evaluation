@@ -43,7 +43,7 @@ import sys
 import numpy
 import argparse
 
-from measurements import associate
+from scripts.measurements import associate
 
 
 def align(model, data):

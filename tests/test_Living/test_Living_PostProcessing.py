@@ -1,12 +1,11 @@
 import numpy as np
 
-import config
+from scripts import config
 from tests.data_for_tests.Living import data_paths
-from PostProcessing import PostProcessing
-from annotators.AnnotatorImage import AnnotatorImage
-from associators.AssociatorAnnot import AssociatorAnnot
-from pcdBuilders.PcdBuilderLiving import PcdBuilderLiving
-from tests.data_for_tests.Living.ground_truth_data import max_planes
+from scripts.PostProcessing import PostProcessing
+from scripts.annotators.AnnotatorImage import AnnotatorImage
+from scripts.associators.AssociatorAnnot import AssociatorAnnot
+from scripts.pcdBuilders.PcdBuilderLiving import PcdBuilderLiving
 
 
 def test_post_processing():

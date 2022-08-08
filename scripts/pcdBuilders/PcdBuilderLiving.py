@@ -1,12 +1,10 @@
-from typing import List
-
 import cv2
 import numpy as np
 
-from annotators.AnnotatorImage import AnnotatorImage
-from Camera import Camera
-from dto.Pcd import Pcd
-from pcdBuilders.PcdBuilder import PcdBuilder
+from scripts.annotators.AnnotatorImage import AnnotatorImage
+from scripts.Camera import Camera
+from scripts.dto.Pcd import Pcd
+from scripts.pcdBuilders.PcdBuilder import PcdBuilder
 
 
 class PcdBuilderLiving(PcdBuilder):

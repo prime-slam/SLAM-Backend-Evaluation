@@ -1,22 +1,18 @@
 import argparse
 import os
-import open3d as o3d
 
-
-import config
-import read_office
-from SLAMGraph import SLAMGraph
-from annotators.AnnotatorImage import AnnotatorImage
-from annotators.AnnotatorPointCloud import AnnotatorPointCloud
-from associators.AssociatorAnnot import AssociatorAnnot
-from associators.AssociatorFront import AssociatorFront
-from dto.Pcd import Pcd
-from measurements.MeasureError import MeasureError
-from pcdBuilders.PcdBuilderLiving import PcdBuilderLiving
-from pcdBuilders.PcdBuilderOffice import PcdBuilderOffice
-from pcdBuilders.PcdBuilderPointCloud import PcdBuilderPointCloud
-from PostProcessing import PostProcessing
-from Visualisation import Visualisation
+from scripts import read_office, config
+from scripts.SLAMGraph import SLAMGraph
+from scripts.annotators.AnnotatorImage import AnnotatorImage
+from scripts.annotators.AnnotatorPointCloud import AnnotatorPointCloud
+from scripts.associators.AssociatorAnnot import AssociatorAnnot
+from scripts.associators.AssociatorFront import AssociatorFront
+from scripts.measurements.MeasureError import MeasureError
+from scripts.pcdBuilders.PcdBuilderLiving import PcdBuilderLiving
+from scripts.pcdBuilders.PcdBuilderOffice import PcdBuilderOffice
+from scripts.pcdBuilders.PcdBuilderPointCloud import PcdBuilderPointCloud
+from scripts.PostProcessing import PostProcessing
+from scripts.Visualisation import Visualisation
 
 
 def create_data_list_living(main_data_path: str):
@@ -109,8 +105,7 @@ def main(
         associator = AssociatorFront()
         associator.associate(pcds)
 
-    post_processing = PostProcessing()
-    max_tracks = post_processing.post_process(pcds)
+    max_tracks = PostProcessing.post_process(pcds)
 
     slam_graph = SLAMGraph()
     graph_estimated_state = slam_graph.estimate_the_graph(pcds, max_tracks)

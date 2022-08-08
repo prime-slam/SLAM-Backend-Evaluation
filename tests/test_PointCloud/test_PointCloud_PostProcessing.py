@@ -1,11 +1,11 @@
 import numpy as np
 
-import config
+from scripts import config
 from tests.data_for_tests.PointCloud import data_paths
-from PostProcessing import PostProcessing
-from annotators.AnnotatorPointCloud import AnnotatorPointCloud
-from associators.AssociatorFront import AssociatorFront
-from pcdBuilders.PcdBuilderPointCloud import PcdBuilderPointCloud
+from scripts.PostProcessing import PostProcessing
+from scripts.annotators.AnnotatorPointCloud import AnnotatorPointCloud
+from scripts.associators.AssociatorFront import AssociatorFront
+from scripts.pcdBuilders.PcdBuilderPointCloud import PcdBuilderPointCloud
 
 
 def test_post_processing():

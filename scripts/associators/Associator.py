@@ -1,9 +1,8 @@
 from abc import ABC, abstractmethod
 from typing import List
+from scripts.dto.Pcd import Pcd
 
 import numpy as np
-
-from dto.Pcd import Pcd
 
 
 class Associator(ABC):

@@ -1,9 +1,8 @@
 from typing import List
+from mrob.mrob import FGraph, geometry, LM
+from dto.Pcd import Pcd
 
 import numpy as np
-from mrob.mrob import FGraph, geometry, LM
-
-from dto.Pcd import Pcd
 
 
 class SLAMGraph:

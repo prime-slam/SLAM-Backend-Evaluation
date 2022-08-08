@@ -1,10 +1,10 @@
 import numpy as np
 import pytest
 
-import config
+from scripts import config
 from tests.data_for_tests.PointCloud import data_paths, ground_truth_data
-from annotators.AnnotatorPointCloud import AnnotatorPointCloud
-from pcdBuilders.PcdBuilderPointCloud import PcdBuilderPointCloud
+from scripts.annotators.AnnotatorPointCloud import AnnotatorPointCloud
+from scripts.pcdBuilders.PcdBuilderPointCloud import PcdBuilderPointCloud
 
 
 def test_num_annotated_planes():
