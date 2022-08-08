@@ -1,8 +1,8 @@
 import numpy as np
+import open3d as o3d
 
 from open3d.cpu import pybind
 from scripts import config
-import open3d as o3d
 from scripts.annotators.AnnotatorImage import AnnotatorImage
 from scripts.pcdBuilders.PcdBuilderLiving import PcdBuilderLiving
 from tests.data_for_tests import o3d_camera

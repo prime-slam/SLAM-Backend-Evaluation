@@ -1,4 +1,4 @@
-from Camera import Camera
+from scripts.Camera import Camera
 
 CAMERA_ICL = Camera(
     width=640,
