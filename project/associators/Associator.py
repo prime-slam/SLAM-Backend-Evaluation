@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from typing import List
-from scripts.dto.Pcd import Pcd
+from project.dto.Pcd import Pcd
 
 import numpy as np
 

@@ -2,12 +2,12 @@ import math
 import os
 import numpy as np
 
-from scripts.measurements import evaluate_ate, evaluate_rpe
+from project.measurements import evaluate_ate, evaluate_rpe
 
 
 class MeasureError:
     """
-    evaluates ate and rpe errors with TUM scripts for evaluating
+    evaluates ate and rpe errors with TUM project for evaluating
     :attribute ds_filename_gt: directory with ground truth data
     :attribute num_of_all_nodes: number of all the nodes
     :attribute __file_to_write_estimated: file name where to all the needed estimated data will be writen

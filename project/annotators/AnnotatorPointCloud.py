@@ -1,6 +1,6 @@
 from typing import List
-from scripts.dto.Plane import Plane
-from scripts.annotators.Annotator import Annotator
+from project.dto.Plane import Plane
+from project.annotators.Annotator import Annotator
 
 import numpy as np
 

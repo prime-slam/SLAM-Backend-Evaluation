@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import List
-from scripts.dto.Pcd import Pcd
-from scripts.dto.Plane import Plane
+from project.dto.Pcd import Pcd
+from project.dto.Plane import Plane
 
 
 class Annotator(ABC):

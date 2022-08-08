@@ -1,6 +1,6 @@
-from scripts.annotators.Annotator import *
-from scripts.Camera import Camera
-from scripts.dto.Pcd import Pcd
+from project.annotators.Annotator import *
+from project.Camera import Camera
+from project.dto.Pcd import Pcd
 
 
 class PcdBuilder(ABC):

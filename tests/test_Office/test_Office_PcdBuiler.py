@@ -1,10 +1,10 @@
 import numpy as np
 
-from scripts import config
+from project import config
 import open3d as o3d
 
-from scripts.annotators.AnnotatorImage import AnnotatorImage
-from scripts.pcdBuilders.PcdBuilderOffice import PcdBuilderOffice
+from project.annotators.AnnotatorImage import AnnotatorImage
+from project.pcdBuilders.PcdBuilderOffice import PcdBuilderOffice
 from tests.data_for_tests.Office import data_paths
 
 

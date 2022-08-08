@@ -1,10 +1,10 @@
 import cv2
 import numpy as np
 
-from scripts.annotators.AnnotatorImage import AnnotatorImage
-from scripts.Camera import Camera
-from scripts.dto.Pcd import Pcd
-from scripts.pcdBuilders.PcdBuilder import PcdBuilder
+from project.annotators.AnnotatorImage import AnnotatorImage
+from project.Camera import Camera
+from project.dto.Pcd import Pcd
+from project.pcdBuilders.PcdBuilder import PcdBuilder
 
 
 class PcdBuilderLiving(PcdBuilder):

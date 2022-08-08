@@ -1,7 +1,7 @@
 from typing import List
 
-from scripts import config
-from scripts.dto.Pcd import Pcd
+from project import config
+from project.dto.Pcd import Pcd
 
 
 class PostProcessing:

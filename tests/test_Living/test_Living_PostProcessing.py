@@ -1,11 +1,11 @@
 import numpy as np
 
-from scripts import config
+from project import config
 from tests.data_for_tests.Living import data_paths
-from scripts.PostProcessing import PostProcessing
-from scripts.annotators.AnnotatorImage import AnnotatorImage
-from scripts.associators.AssociatorAnnot import AssociatorAnnot
-from scripts.pcdBuilders.PcdBuilderLiving import PcdBuilderLiving
+from project.PostProcessing import PostProcessing
+from project.annotators.AnnotatorImage import AnnotatorImage
+from project.associators.AssociatorAnnot import AssociatorAnnot
+from project.pcdBuilders.PcdBuilderLiving import PcdBuilderLiving
 
 
 def test_post_processing():

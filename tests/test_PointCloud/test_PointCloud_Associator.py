@@ -2,10 +2,10 @@ import pytest
 import numpy as np
 
 from tests.data_for_tests.PointCloud import data_paths
-from scripts import config
-from scripts.annotators.AnnotatorPointCloud import AnnotatorPointCloud
-from scripts.associators.AssociatorFront import AssociatorFront
-from scripts.pcdBuilders.PcdBuilderPointCloud import PcdBuilderPointCloud
+from project import config
+from project.annotators.AnnotatorPointCloud import AnnotatorPointCloud
+from project.associators.AssociatorFront import AssociatorFront
+from project.pcdBuilders.PcdBuilderPointCloud import PcdBuilderPointCloud
 from tests.data_for_tests.PointCloud.ground_truth_data import associated_planes
 
 

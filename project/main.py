@@ -1,18 +1,18 @@
 import argparse
 import os
 
-from scripts import read_office, config
-from scripts.SLAMGraph import SLAMGraph
-from scripts.annotators.AnnotatorImage import AnnotatorImage
-from scripts.annotators.AnnotatorPointCloud import AnnotatorPointCloud
-from scripts.associators.AssociatorAnnot import AssociatorAnnot
-from scripts.associators.AssociatorFront import AssociatorFront
-from scripts.measurements.MeasureError import MeasureError
-from scripts.pcdBuilders.PcdBuilderLiving import PcdBuilderLiving
-from scripts.pcdBuilders.PcdBuilderOffice import PcdBuilderOffice
-from scripts.pcdBuilders.PcdBuilderPointCloud import PcdBuilderPointCloud
-from scripts.PostProcessing import PostProcessing
-from scripts.Visualisation import Visualisation
+from project import read_office, config
+from project.SLAMGraph import SLAMGraph
+from project.annotators.AnnotatorImage import AnnotatorImage
+from project.annotators.AnnotatorPointCloud import AnnotatorPointCloud
+from project.associators.AssociatorAnnot import AssociatorAnnot
+from project.associators.AssociatorFront import AssociatorFront
+from project.measurements.MeasureError import MeasureError
+from project.pcdBuilders.PcdBuilderLiving import PcdBuilderLiving
+from project.pcdBuilders.PcdBuilderOffice import PcdBuilderOffice
+from project.pcdBuilders.PcdBuilderPointCloud import PcdBuilderPointCloud
+from project.PostProcessing import PostProcessing
+from project.Visualisation import Visualisation
 
 
 def create_data_list_living(main_data_path: str):

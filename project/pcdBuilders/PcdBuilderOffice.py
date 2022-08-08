@@ -1,9 +1,9 @@
-from scripts import read_office
+from project import read_office
 
-from scripts.Camera import Camera
-from scripts.dto.Pcd import Pcd
-from scripts.annotators.AnnotatorImage import AnnotatorImage
-from scripts.pcdBuilders.PcdBuilder import PcdBuilder
+from project.Camera import Camera
+from project.dto.Pcd import Pcd
+from project.annotators.AnnotatorImage import AnnotatorImage
+from project.pcdBuilders.PcdBuilder import PcdBuilder
 
 
 class PcdBuilderOffice(PcdBuilder):

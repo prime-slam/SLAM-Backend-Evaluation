@@ -1,10 +1,10 @@
 import numpy as np
 import open3d as o3d
 
-from scripts.annotators.AnnotatorPointCloud import AnnotatorPointCloud
-from scripts.Camera import Camera
-from scripts.dto.Pcd import Pcd
-from scripts.pcdBuilders.PcdBuilder import PcdBuilder
+from project.annotators.AnnotatorPointCloud import AnnotatorPointCloud
+from project.Camera import Camera
+from project.dto.Pcd import Pcd
+from project.pcdBuilders.PcdBuilder import PcdBuilder
 
 
 class PcdBuilderPointCloud(PcdBuilder):

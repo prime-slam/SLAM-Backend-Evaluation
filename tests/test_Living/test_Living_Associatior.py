@@ -1,10 +1,10 @@
 import numpy as np
 import pytest
 
-from scripts import config
-from scripts.annotators.AnnotatorImage import AnnotatorImage
-from scripts.associators.AssociatorAnnot import AssociatorAnnot
-from scripts.pcdBuilders.PcdBuilderLiving import PcdBuilderLiving
+from project import config
+from project.annotators.AnnotatorImage import AnnotatorImage
+from project.associators.AssociatorAnnot import AssociatorAnnot
+from project.pcdBuilders.PcdBuilderLiving import PcdBuilderLiving
 from tests.data_for_tests.Living import data_paths
 from tests.data_for_tests.Living.data_paths import annot_list
 

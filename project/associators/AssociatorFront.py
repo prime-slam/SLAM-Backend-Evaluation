@@ -1,6 +1,6 @@
 from typing import List
-from scripts.dto.Pcd import Pcd
-from scripts.associators.Associator import Associator
+from project.dto.Pcd import Pcd
+from project.associators.Associator import Associator
 
 import numpy as np
 import math
