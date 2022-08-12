@@ -21,7 +21,7 @@ class MeasureError:
         self.__file_to_write_gt = "measure_error_gt.txt"
 
     @staticmethod
-    def rotation_matrix_to_quaternion(r_matrix):
+    def make_rotation_quaternion_from_matrix(r_matrix):
         """
         :param r_matrix: rotation as a matrix
         :return: rotation as a quaternion
@@ -73,7 +73,7 @@ class MeasureError:
         return q
 
     @staticmethod
-    def make_a_string(timestamp, translation, rotation):
+    def make_string(timestamp, translation, rotation):
         """
         :param timestamp: timestamp
         :param translation: translation as a vector
@@ -129,10 +129,10 @@ class MeasureError:
 
         estimated_matrices = graph_estimated_state[-num_of_nodes + bios :]
         for i, matrix in enumerate(estimated_matrices):
-            data = self.make_a_string(
+            data = self.make_string(
                 first_node + i + bios,
                 matrix[:3, 3],
-                self.rotation_matrix_to_quaternion(matrix[:3, :3]),
+                self.make_rotation_quaternion_from_matrix(matrix[:3, :3]),
             )
             file_to_write_estimated.write(data + "\n")
         file_to_write_estimated.close()

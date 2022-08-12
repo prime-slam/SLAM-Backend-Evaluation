@@ -18,7 +18,7 @@ class SLAMGraph:
         self.graph_trajectory = []
         self.plane_index_to_real_index = {}
 
-    def __build_the_graph(self, pcd_s: List[Pcd], needed_indices: List[int]):
+    def __build_graph(self, pcd_s: List[Pcd], needed_indices: List[int]):
         for pcd in pcd_s:
             real_indx = len(self.plane_index_to_real_index)
             for plane in pcd.planes:
@@ -39,9 +39,9 @@ class SLAMGraph:
             geometry.SE3(), self.graph_trajectory[0], 1e6 * np.identity(6)
         )
 
-    def estimate_the_graph(self, pcd_s: list[Pcd], needed_indices: List[int]):
+    def estimate_graph(self, pcd_s: list[Pcd], needed_indices: List[int]):
 
-        self.__build_the_graph(pcd_s, needed_indices)
+        self.__build_graph(pcd_s, needed_indices)
         w_z = np.identity(4)  # weight matrix
 
         for i, pcd in enumerate(pcd_s):

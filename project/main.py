@@ -108,13 +108,13 @@ def main(
     max_tracks = PostProcessing.post_process(pcds)
 
     slam_graph = SLAMGraph()
-    graph_estimated_state = slam_graph.estimate_the_graph(pcds, max_tracks)
+    graph_estimated_state = slam_graph.estimate_graph(pcds, max_tracks)
 
     measure_error = MeasureError(ds_filename_gt, len(annot_list))
     measure_error.measure_error(first_node, first_gt_node, graph_estimated_state)
 
     visualisation = Visualisation(graph_estimated_state)
-    visualisation.visualisation(pcds, graph_estimated_state)
+    visualisation.visualize(pcds, graph_estimated_state)
 
 
 if __name__ == "__main__":

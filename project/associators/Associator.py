@@ -11,7 +11,7 @@ class Associator(ABC):
     """
 
     @staticmethod
-    def array_to_string(array: np.array) -> str:
+    def make_string_from_array(array: np.array) -> str:
         """
         :param array: array to convert to str
         :return: string with "#" as a separator between the array items

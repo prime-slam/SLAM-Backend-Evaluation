@@ -10,7 +10,7 @@ class Visualisation:
         self.graph_estimated_state = graph_estimated_state
 
     @staticmethod
-    def visualisation_pcd(pcd: Pcd, transforms: List = []):
+    def visualize_pcd(pcd: Pcd, transforms: List = []):
         pc = o3d.geometry.PointCloud()
         pc.points = o3d.utility.Vector3dVector(pcd.points)
 
@@ -31,7 +31,7 @@ class Visualisation:
 
         return pc
 
-    def visualisation(self, pcd_s: List[Pcd], graph_estimated_state):
+    def visualize(self, pcd_s: List[Pcd], graph_estimated_state):
         num_of_nodes = len(pcd_s)
         reflection = np.asarray(
             [[-1, 0, 0, 0], [0, -1, 0, 0], [0, 0, -1, 0], [0, 0, 0, 1]]
@@ -39,7 +39,7 @@ class Visualisation:
 
         pc_answ = o3d.geometry.PointCloud()
         for i in range(num_of_nodes):
-            pc = self.visualisation_pcd(
+            pc = self.visualize_pcd(
                 pcd_s[-(i + 1)], [graph_estimated_state[-(i + 1)], reflection]
             )
             pc = pc.voxel_down_sample(0.05)

@@ -78,7 +78,7 @@ def __get_camera_params_for_frame(depth_image):
     return fx, fy, cx, cy
 
 
-def getting_points(depth_frame_path, cam_intrinsic):
+def get_points(depth_frame_path, cam_intrinsic):
     # Adopted from https://www.doc.ic.ac.uk/~ahanda/VaFRIC/compute3Dpositions.m
     fx, fy, cx, cy = __get_camera_params_for_frame(depth_frame_path)
 
