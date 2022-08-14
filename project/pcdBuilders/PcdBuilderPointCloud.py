@@ -12,14 +12,19 @@ class PcdBuilderPointCloud(PcdBuilder):
     Builds pcd from .pcd and .npy files
     """
 
-    def __init__(self, camera: Camera, annot: AnnotatorPointCloud):
+    def __init__(
+        self,
+        camera: Camera,
+        annot: AnnotatorPointCloud,
+        reflection=None,
+    ):
         super().__init__(camera, annot)
+        self.reflection = reflection
 
     def _get_points(self, depth_image_path):
-        reflection = np.asarray(
-            [[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, -1, 0], [0, 0, 0, 1]]
-        )
-        pc = o3d.io.read_point_cloud(depth_image_path).transform(reflection)
+        pc = o3d.io.read_point_cloud(depth_image_path)
+        if self.reflection is not None:
+            pc = pc.transform(self.reflection)
         to_meters = 1000
 
         return Pcd(np.asarray(pc.points) / to_meters)

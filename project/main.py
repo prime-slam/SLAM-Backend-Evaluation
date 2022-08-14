@@ -1,6 +1,8 @@
 import argparse
 import os
 
+import numpy as np
+
 from project import read_office, config
 from project.SLAMGraph import SLAMGraph
 from project.annotators.AnnotatorImage import AnnotatorImage
@@ -97,7 +99,12 @@ def main(
         main_data_list = main_data_list[first_node : first_node + num_of_nodes]
 
         annot = AnnotatorPointCloud(annot_list)
-        pcd_b = PcdBuilderPointCloud(camera, annot)
+        reflection = np.asarray(
+            [[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, -1, 0], [0, 0, 0, 1]]
+        )
+        pcd_b = PcdBuilderPointCloud(
+            camera, annot, reflection
+        )  # reflection is needed due to dataset (icl nuim) particularities
 
         for i, file in enumerate(annot_list):
             pcds.append(pcd_b.build_pcd(main_data_list[i], i))
