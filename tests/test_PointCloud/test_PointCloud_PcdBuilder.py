@@ -18,7 +18,7 @@ def test_get_points_point_cloud(file_num):
     array_to_compare_1 = np.asarray(pcd_extracted.points) / 1000
 
     annot = AnnotatorPointCloud(data_paths.annot_list)
-    pcd_builder = PcdBuilderPointCloud(config.CAMERA_ICL, annot)
+    pcd_builder = PcdBuilderPointCloud(config.CAMERA_ICL, annot, reflection)
     pcd_built = pcd_builder._get_points(data_paths.main_data_list[file_num])
     array_to_compare_2 = pcd_built.points
 

@@ -9,8 +9,9 @@ from project.pcdBuilders.PcdBuilderPointCloud import PcdBuilderPointCloud
 
 
 def test_post_processing():
+    reflection = np.asarray([[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, -1, 0], [0, 0, 0, 1]])
     annot = AnnotatorPointCloud(data_paths.annot_list)
-    pcd_b = PcdBuilderPointCloud(config.CAMERA_ICL, annot)
+    pcd_b = PcdBuilderPointCloud(config.CAMERA_ICL, annot, reflection)
     pcds = []
 
     for i, file in enumerate(data_paths.annot_list):

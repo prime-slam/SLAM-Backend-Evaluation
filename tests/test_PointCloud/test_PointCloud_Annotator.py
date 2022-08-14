@@ -30,8 +30,9 @@ def test_num_annotated_planes():
     ],
 )
 def test_planes(file_name, file_num, plane_num):
+    reflection = np.asarray([[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, -1, 0], [0, 0, 0, 1]])
     annot = AnnotatorPointCloud(data_paths.annot_list)
-    pcd_b = PcdBuilderPointCloud(config.CAMERA_ICL, annot)
+    pcd_b = PcdBuilderPointCloud(config.CAMERA_ICL, annot, reflection)
     pcd = pcd_b.build_pcd(file_name, file_num)
 
     planes = pcd.planes

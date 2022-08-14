@@ -38,8 +38,9 @@ from tests.data_for_tests.PointCloud.ground_truth_data import associated_planes
     ],
 )
 def test_associated_planes(file_num, indx):
+    reflection = np.asarray([[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, -1, 0], [0, 0, 0, 1]])
     annot = AnnotatorPointCloud(data_paths.annot_list)
-    pcd_b = PcdBuilderPointCloud(config.CAMERA_ICL, annot)
+    pcd_b = PcdBuilderPointCloud(config.CAMERA_ICL, annot, reflection)
     pcd_s = []
 
     for i, image in enumerate(data_paths.main_data_list):
