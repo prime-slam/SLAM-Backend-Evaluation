@@ -77,4 +77,10 @@ class AssociatorFront(Associator):
                     plane.track = indx
                     indx += 1
                     plane.color = self.__generate_color()
+        for i, pcd in enumerate(pcd_s):
+            print("current pcd num " + str(i))
+            for plane in pcd.planes:
+                print(str(plane.track))
+                print(plane.equation.tolist())
+
         return pcd_s

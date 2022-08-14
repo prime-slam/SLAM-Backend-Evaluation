@@ -19,6 +19,8 @@ def test_get_points_point_cloud():
         extrinsic=np.eye(4),
         depth_scale=5000,
     )
+    reflection = np.asarray([[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, -1, 0], [0, 0, 0, 1]])
+    pcd_extracted.transform(reflection)
     array_to_compare_1 = np.asarray(pcd_extracted.points)
 
     annot = AnnotatorImage(data_paths.annot_list)

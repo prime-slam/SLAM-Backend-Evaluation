@@ -12,6 +12,14 @@ from tests.data_for_tests.PointCloud.ground_truth_data import associated_planes
 @pytest.mark.parametrize(
     "file_num, indx",
     [
+        [0, 0],
+        [0, 1],
+        [0, 2],
+        [0, 3],
+        [0, 4],
+        [0, 5],
+        [0, 6],
+        [0, 7],
         [1, 0],
         [1, 1],
         [1, 2],
@@ -42,5 +50,5 @@ def test_associated_planes(file_num, indx):
     for plane in pcd_s[file_num].planes:
         if plane.track == indx:
             np.testing.assert_almost_equal(
-                plane.equation, associated_planes[file_num - 1][indx]
+                plane.equation, associated_planes[file_num][indx]
             )

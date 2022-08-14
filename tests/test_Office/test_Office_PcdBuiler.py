@@ -9,7 +9,10 @@ from tests.data_for_tests.Office import data_paths
 
 
 def test_get_points_point_cloud():
-    pcd_extracted = o3d.io.read_point_cloud("tests/data_for_tests/Office/office00.pcd")
+    reflection = np.asarray([[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, -1, 0], [0, 0, 0, 1]])
+    pcd_extracted = o3d.io.read_point_cloud(
+        "tests/data_for_tests/Office/office00.pcd"
+    ).transform(reflection)
 
     array_to_compare_1 = np.asarray(pcd_extracted.points)
 

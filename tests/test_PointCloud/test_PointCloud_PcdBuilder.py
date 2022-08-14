@@ -10,8 +10,11 @@ from project.pcdBuilders.PcdBuilderPointCloud import PcdBuilderPointCloud
 
 @pytest.mark.parametrize("file_num", [0, 1, 2])
 def test_get_points_point_cloud(file_num):
+    reflection = np.asarray([[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, -1, 0], [0, 0, 0, 1]])
 
-    pcd_extracted = o3d.io.read_point_cloud(data_paths.main_data_list[file_num])
+    pcd_extracted = o3d.io.read_point_cloud(
+        data_paths.main_data_list[file_num]
+    ).transform(reflection)
     array_to_compare_1 = np.asarray(pcd_extracted.points) / 1000
 
     annot = AnnotatorPointCloud(data_paths.annot_list)
