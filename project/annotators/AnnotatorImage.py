@@ -30,7 +30,5 @@ class AnnotatorImage(Annotator):
             equation = Plane.get_equation(plane_points)
             plane = Plane(equation, track=-1, color=color, indices=indices)
             planes_of_image.append((plane))
-        for plane in planes_of_image:
-            print(plane.equation.tolist())
 
         return planes_of_image
