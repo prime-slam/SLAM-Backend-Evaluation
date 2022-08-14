@@ -110,7 +110,7 @@ def main(
     slam_graph = SLAMGraph()
     graph_estimated_state = slam_graph.estimate_graph(pcds, max_tracks)
 
-    measure_error = MeasureError(ds_filename_gt, len(annot_list))
+    measure_error = MeasureError(ds_filename_gt, len(annot_list), num_of_nodes)
     measure_error.measure_error(first_node, first_gt_node, graph_estimated_state)
 
     visualisation = Visualisation(graph_estimated_state)

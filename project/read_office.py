@@ -106,10 +106,10 @@ def get_points(depth_frame_path, cam_intrinsic):
         # depth_data = depth_data.reshape((480, 640))
 
         scale = 100  # from cm to m
-        points[:, 2] = (
+        points[:, 2] = -(
             depth_data / np.sqrt(x_modifier**2 + y_modifier**2 + 1) / scale
         )
-        points[:, 0] = x_modifier * points[:, 2]
-        points[:, 1] = y_modifier * points[:, 2]
+        points[:, 0] = -x_modifier * points[:, 2]
+        points[:, 1] = -y_modifier * points[:, 2]
 
     return points

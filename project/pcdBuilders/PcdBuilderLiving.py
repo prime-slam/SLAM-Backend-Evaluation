@@ -26,7 +26,7 @@ class PcdBuilderLiving(PcdBuilder):
         x_matrix = x_over_z * z_matrix
         y_matrix = y_over_z * z_matrix
 
-        return np.dstack((x_matrix, y_matrix, z_matrix))
+        return np.dstack((x_matrix, y_matrix, -z_matrix))
 
     def _get_points(self, depth_image_path) -> Pcd:
 

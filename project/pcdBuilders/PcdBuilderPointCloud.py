@@ -16,7 +16,10 @@ class PcdBuilderPointCloud(PcdBuilder):
         super().__init__(camera, annot)
 
     def _get_points(self, depth_image_path):
-        pc = o3d.io.read_point_cloud(depth_image_path)
+        reflection = np.asarray(
+            [[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, -1, 0], [0, 0, 0, 1]]
+        )
+        pc = o3d.io.read_point_cloud(depth_image_path).transform(reflection)
         to_meters = 1000
 
         return Pcd(np.asarray(pc.points) / to_meters)

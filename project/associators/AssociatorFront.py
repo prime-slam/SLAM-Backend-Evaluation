@@ -17,9 +17,9 @@ class AssociatorFront(Associator):
 
     def __generate_color(self):
         answ = np.random.randint(255, size=3)
-        while self.array_to_string(answ) in self.__set_of_generated_colors:
+        while self.make_string_from_array(answ) in self.__set_of_generated_colors:
             answ = self.__generate_color()
-        self.__set_of_generated_colors.add(self.array_to_string(answ))
+        self.__set_of_generated_colors.add(self.make_string_from_array(answ))
 
         return answ
 

@@ -14,9 +14,10 @@ class MeasureError:
     :attribute __file_to_write_gt: file name where all the needed ground truth data will be writen
     """
 
-    def __init__(self, ds_filename_gt: str, num_of_all_nodes: int):
+    def __init__(self, ds_filename_gt: str, num_of_all_nodes: int, needed_nodes: int):
         self.ds_filename_gt = ds_filename_gt
         self.num_of_all_nodes = num_of_all_nodes
+        self.num_of_needed_nondes = needed_nodes
         self.__file_to_write_estimated = "measure_error_estimated.txt"
         self.__file_to_write_gt = "measure_error_gt.txt"
 
@@ -127,7 +128,7 @@ class MeasureError:
 
         file_to_write_estimated = open(self.__file_to_write_estimated, "w")
 
-        estimated_matrices = graph_estimated_state[-num_of_nodes + bios :]
+        estimated_matrices = graph_estimated_state[-self.num_of_needed_nondes + bios :]
         for i, matrix in enumerate(estimated_matrices):
             data = self.make_string(
                 first_node + i + bios,
