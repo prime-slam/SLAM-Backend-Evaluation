@@ -18,7 +18,7 @@ from tests.data_for_tests.Living import data_paths, ground_truth_data
 def test_num_annotated_planes(file_num):
     annot = AnnotatorImage(data_paths.annot_list)
     pcd_b = PcdBuilderLiving(config.CAMERA_ICL, annot)
-    pcd = pcd_b.build_pcd(data_paths.main_data_list[file_num], file_num)
+    pcd = pcd_b.build_pcd(data_paths.main_data_list[file_num], file_num, verbose=False)
 
     planes = pcd.planes
     assert len(planes) == len(ground_truth_data.planes_to_test_annotator[file_num])
@@ -37,7 +37,7 @@ list_of_params = list_of_params_0 + list_of_params_1 + list_of_params_2
 def test_planes(file_num, plane_num):
     annot = AnnotatorImage(data_paths.annot_list)
     pcd_b = PcdBuilderLiving(config.CAMERA_ICL, annot)
-    pcd = pcd_b.build_pcd(data_paths.main_data_list[file_num], file_num)
+    pcd = pcd_b.build_pcd(data_paths.main_data_list[file_num], file_num, verbose=False)
 
     planes = pcd.planes
 
