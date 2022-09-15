@@ -15,13 +15,13 @@ def test_post_processing():
     pcds = []
 
     for i, file in enumerate(data_paths.annot_list):
-        pcds.append(pcd_b.build_pcd(data_paths.main_data_list[i], i, verbose=False))
+        pcds.append(pcd_b.build_pcd(data_paths.main_data_list[i], i))
 
     assoc = AssociatorFront()
     assoc.associate(pcds)
 
     post_processing = PostProcessing()
-    max_tracks = post_processing.post_process(pcds, verbose=False)
+    max_tracks = post_processing.post_process(pcds)
 
     np.testing.assert_array_equal(
         max_tracks[: config.MAX_PLANES_COUNT], max_tracks[: config.MAX_PLANES_COUNT]

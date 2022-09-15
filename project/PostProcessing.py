@@ -10,7 +10,7 @@ class PostProcessing:
     """
 
     @staticmethod
-    def post_process(pcd_s: List[Pcd], verbose):
+    def post_process(pcd_s: List[Pcd], verbose=False):
         """
         :param pcd_s: list of pcd objects
         :return: indices of planes with maximum points

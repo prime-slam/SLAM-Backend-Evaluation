@@ -44,9 +44,7 @@ def test_planes(file_num, color, indx):
     pcds = []
     annot = AnnotatorImage(annot_list)
     pcd_b = PcdBuilderLiving(config.CAMERA_ICL, annot)
-    pcds.append(
-        pcd_b.build_pcd(data_paths.main_data_list[file_num], file_num, verbose=False)
-    )
+    pcds.append(pcd_b.build_pcd(data_paths.main_data_list[file_num], file_num))
 
     associator = AssociatorAnnot()
     associator.associate(pcds)

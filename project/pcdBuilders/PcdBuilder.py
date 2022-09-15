@@ -22,7 +22,7 @@ class PcdBuilder(ABC):
         """
         pass
 
-    def build_pcd(self, path_depth_image, pcd_num, verbose):
+    def build_pcd(self, path_depth_image, pcd_num, verbose=False):
         """
         :param path_depth_image: path to a main data file
         :param pcd_num: number of the file

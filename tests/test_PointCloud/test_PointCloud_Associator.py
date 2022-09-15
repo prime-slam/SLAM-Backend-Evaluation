@@ -44,7 +44,7 @@ def test_associated_planes(file_num, indx):
     pcd_s = []
 
     for i, image in enumerate(data_paths.main_data_list):
-        pcd_s.append(pcd_b.build_pcd(image, i, verbose=False))
+        pcd_s.append(pcd_b.build_pcd(image, i))
 
     associator = AssociatorFront()
     pcd_s = associator.associate(pcd_s)

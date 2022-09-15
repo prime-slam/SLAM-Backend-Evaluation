@@ -10,7 +10,7 @@ from project.pcdBuilders.PcdBuilderPointCloud import PcdBuilderPointCloud
 def test_num_annotated_planes():
     annot = AnnotatorPointCloud(data_paths.annot_list)
     pcd_b = PcdBuilderPointCloud(config.CAMERA_ICL, annot)
-    pcd = pcd_b.build_pcd(data_paths.main_data_list[0], 0, verbose=False)
+    pcd = pcd_b.build_pcd(data_paths.main_data_list[0], 0)
 
     planes = pcd.planes
     assert len(planes) == len(ground_truth_data.planes_to_test_annotator)
