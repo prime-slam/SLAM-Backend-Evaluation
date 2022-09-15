@@ -10,14 +10,15 @@ class PostProcessing:
     """
 
     @staticmethod
-    def post_process(pcd_s: List[Pcd]):
+    def post_process(pcd_s: List[Pcd], verbose):
         """
         :param pcd_s: list of pcd objects
         :return: indices of planes with maximum points
         """
         indx_to_max_num_points = {}
         for i, pcd in enumerate(pcd_s):
-            print("postprocessing " + str(i))
+            if verbose:
+                print("postprocessing " + str(i))
             for plane in pcd.planes:
                 num_of_points = len(plane.plane_indices)
                 if (

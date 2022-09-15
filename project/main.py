@@ -1,5 +1,6 @@
 import argparse
 import os
+from typing import List
 
 import numpy as np
 
@@ -62,6 +63,7 @@ def main(
     first_gt_node: int,
     num_of_nodes: int,
     ds_filename_gt: str,
+    verbose: bool,
 ):
 
     camera = config.CAMERA_ICL
@@ -80,16 +82,15 @@ def main(
             png_list, main_data_list = create_main_lists_office(main_data_path)
             png_list = png_list[first_node : first_node + num_of_nodes]
             main_data_list = main_data_list[first_node : first_node + num_of_nodes]
-            print(main_data_list)
+            if verbose:
+                print(main_data_list)
         annot = AnnotatorImage(annot_list)
         if which_format == 1:
             pcd_b = PcdBuilderLiving(camera, annot)
         else:
             pcd_b = PcdBuilderOffice(camera, annot)
-
         for i, image in enumerate(main_data_list):
             pcds.append(pcd_b.build_pcd(main_data_list[i], i))
-
         associator = AssociatorAnnot()
         associator.associate(pcds)
 
@@ -107,12 +108,12 @@ def main(
         )  # reflection is needed due to dataset (icl nuim) particularities
 
         for i, file in enumerate(annot_list):
-            pcds.append(pcd_b.build_pcd(main_data_list[i], i))
+            pcds.append(pcd_b.build_pcd(main_data_list[i], i, verbose))
 
         associator = AssociatorFront()
         associator.associate(pcds)
 
-    max_tracks = PostProcessing.post_process(pcds)
+    max_tracks = PostProcessing.post_process(pcds, verbose)
 
     slam_graph = SLAMGraph()
     graph_estimated_state = slam_graph.estimate_graph(pcds, max_tracks)
@@ -151,7 +152,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "ds_filename_gt", type=str, help="Filename of a file with gt references"
     )
-
+    parser.add_argument("--verbose", help="Print processing info", action="store_true")
     args = parser.parse_args()
 
     main(
@@ -162,4 +163,5 @@ if __name__ == "__main__":
         args.first_gt_node,
         args.num_of_nodes,
         args.ds_filename_gt,
+        args.verbose,
     )

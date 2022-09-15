@@ -18,7 +18,7 @@ class PcdBuilderLiving(PcdBuilder):
     def __convert_from_plane_to_3d(self, u, v, depth):
         x_over_z = (
             v - self.cam.cx
-        ) / self.cam.focal_x  # создать матрицу result (rows, colums, 3)
+        ) / self.cam.focal_x  # matrix result (rows, colums, 3)
         y_over_z = (u - self.cam.cy) / self.cam.focal_y
 
         z_matrix = depth / self.cam.scale

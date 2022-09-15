@@ -22,7 +22,7 @@ class PcdBuilder(ABC):
         """
         pass
 
-    def build_pcd(self, path_depth_image, pcd_num):
+    def build_pcd(self, path_depth_image, pcd_num, verbose):
         """
         :param path_depth_image: path to a main data file
         :param pcd_num: number of the file
@@ -31,6 +31,7 @@ class PcdBuilder(ABC):
         pcd = self._get_points(path_depth_image)
         pcd = self._annot.annotate(pcd, pcd_num)
 
-        print(path_depth_image)
+        if verbose:
+            print(path_depth_image)
 
         return pcd

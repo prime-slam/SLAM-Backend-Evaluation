@@ -13,7 +13,7 @@ class AssociatorAnnot(Associator):
         self.__color_to_indx = color_to_indx
 
     def associate(self, pcd_s: List[Pcd]):
-        for i, pcd in enumerate(pcd_s):
+        for pcd in pcd_s:
             for plane in pcd.planes:
                 color_str = self.make_string_from_array(plane.color)
                 if color_str not in self.__color_to_indx:  # if the plane is new
