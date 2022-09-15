@@ -152,7 +152,12 @@ if __name__ == "__main__":
     parser.add_argument(
         "ds_filename_gt", type=str, help="Filename of a file with gt references"
     )
-    parser.add_argument("--verbose", help="Print processing info", action="store_true")
+    parser.add_argument(
+        "-verbose",
+        help="Print processing info",
+        action="store_true",
+        default=False,
+    )
     args = parser.parse_args()
 
     main(
