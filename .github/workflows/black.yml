@@ -1,0 +1,21 @@
+name: Lint
+
+on: [push, pull_request]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: browniebroke/pre-commit-autoupdate-action@main
+      - name: commit
+        if: failure()
+        uses: peter-evans/create-pull-request@v3
+        with:
+          token: ${{ secrets.ACTIONS_TOKEN}}
+          args: ". --check --verbose --exclude README.md"
+          branch: branch_to_fix_black
+          title: Fixing black
+          commit-message: "chore: fixing black"
+          body: Applying requested changes.
+          base: ${{ github.head_ref }}

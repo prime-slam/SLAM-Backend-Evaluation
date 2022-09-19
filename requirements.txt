@@ -1,0 +1,6 @@
+black~=22.3.0
+numpy~=1.23.1
+open3d
+opencv-python~=4.6.0.66
+pre-commit
+pytest~=7.1.2
