@@ -1,4 +1,4 @@
-# SLAMBackendAlgos
+# SLAM-Backend-Evaluation
 
 A Project for benchmarking existing SLAM algorithms on planes dataset.
 Benchmarking is done on an example of two [ICL NUIM datasets](https://www.doc.ic.ac.uk/~ahanda/VaFRIC/iclnuim.html):
