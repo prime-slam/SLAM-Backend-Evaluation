@@ -3,10 +3,10 @@ from project.dto.Pcd import Pcd
 from project.associators.Associator import Associator
 
 
-class AssociatorAnnot(Associator):
+class AssociatorAnnotImg(Associator):
     """
     Associates planes with annotation
-    :attribute __color_to_indx: map to allign color of a plane to its index
+    :attribute __color_to_indx: map to align color of a plane to its index
     """
 
     def __init__(self, color_to_indx={}):

@@ -1,26 +1,57 @@
 import argparse
+import csv
 import os
-from typing import List
+from typing import List, Tuple
 
 import numpy as np
 
 from project import read_office, config
 from project.SLAMGraph import SLAMGraph
+from project.Visualisation import Visualisation
 from project.annotators.AnnotatorImage import AnnotatorImage
 from project.annotators.AnnotatorPointCloud import AnnotatorPointCloud
-from project.associators.AssociatorAnnot import AssociatorAnnot
+
+from project.associators.AssociatorAnnotImg import AssociatorAnnotImg
+from project.associators.AssociatorAnnotNpy import AssociatorAnnotNpy
 from project.associators.AssociatorFront import AssociatorFront
 from project.measurements.MeasureError import MeasureError
+from project.pcdBuilders.PcdBuilderKitti import PcdBuilderKitti
 from project.pcdBuilders.PcdBuilderLiving import PcdBuilderLiving
 from project.pcdBuilders.PcdBuilderOffice import PcdBuilderOffice
 from project.pcdBuilders.PcdBuilderPointCloud import PcdBuilderPointCloud
-from project.PostProcessing import PostProcessing
-from project.Visualisation import Visualisation
+from project.postprocessing.EnoughPlanesDetector import EnoughPlanesDetector
+from project.postprocessing.PlaneInfoPrinter import PlaneInfoPrinter
+from project.postprocessing.PlaneRemover import PlaneRemover
+from project.postprocessing.SmallPlanesFilter import SmallPlanesFilter
+from project.utils.intervals import load_evaluation_intervals, dump_evaluation_intervals, ids_list_to_intervals
+
+FORMAT_ICL_TUM = 1
+FORMAT_ICL = 2
+FORMAT_PCD = 3
+FORMAT_KITTI = 4
+
+
+class TumFilenameComparator(str):
+    def __lt__(self, other):
+        items = self[:-4].split(".")
+        other_items = other[:-4].split(".")
+        for i, item in enumerate(items):
+            if int(item) != int(other_items[i]):
+                return int(item) < int(other_items[i])
+
+        return True
+
+
+def create_data_list_kitti(main_data_path: str):
+    depth = os.listdir(main_data_path)
+    depth = sorted(depth, key=lambda x: int(x[-10:-4]))
+    main_data_list = list(map(lambda x: os.path.join(main_data_path, x), depth))
+    return main_data_list
 
 
 def create_data_list_living(main_data_path: str):
     depth = os.listdir(main_data_path)
-    depth = sorted(depth, key=lambda x: int(x[:-4]))
+    depth = sorted(depth, key=TumFilenameComparator)
     main_data_list = list(map(lambda x: os.path.join(main_data_path, x), depth))
     return main_data_list
 
@@ -58,46 +89,28 @@ def create_main_and_annot_list(main_data_path: str):
 def main(
     main_data_path: str,
     annot_path: str,
-    which_format: int,
-    first_node: int,
+    input_format_code: int,
+    intervals_source_path: str,
     first_gt_node: int,
-    num_of_nodes: int,
     ds_filename_gt: str,
 ):
-
     camera = config.CAMERA_ICL
-    pcds = []
 
-    if which_format == 1 or which_format == 2:
-        if which_format == 1:
-            main_data_list = create_data_list_living(main_data_path)[
-                first_node : first_node + num_of_nodes
-            ]
-            annot_list = create_data_list_living(annot_path)[
-                first_node : first_node + num_of_nodes
-            ]
+    if input_format_code == FORMAT_ICL_TUM or input_format_code == FORMAT_ICL:
+        if input_format_code == FORMAT_ICL_TUM:
+            main_data_list = create_data_list_living(main_data_path)
+            annot_list = create_data_list_living(annot_path)
         else:
             annot_list = create_annot_list_office(annot_path)
             png_list, main_data_list = create_main_lists_office(main_data_path)
-            png_list = png_list[first_node : first_node + num_of_nodes]
-            main_data_list = main_data_list[first_node : first_node + num_of_nodes]
-            if verbose:
-                print(main_data_list)
-        annot = AnnotatorImage(annot_list)
-        if which_format == 1:
+        annot = AnnotatorImage(annot_list, main_data_list)
+        if input_format_code == FORMAT_ICL_TUM:
             pcd_b = PcdBuilderLiving(camera, annot)
         else:
             pcd_b = PcdBuilderOffice(camera, annot)
-        for i, image in enumerate(main_data_list):
-            pcds.append(pcd_b.build_pcd(main_data_list[i], i))
-        associator = AssociatorAnnot()
-        associator.associate(pcds)
-
-    else:
+        associator = AssociatorAnnotImg()
+    elif input_format_code == FORMAT_PCD:
         annot_list, main_data_list = create_main_and_annot_list(main_data_path)
-        annot_list = annot_list[first_node : first_node + num_of_nodes]
-        main_data_list = main_data_list[first_node : first_node + num_of_nodes]
-
         annot = AnnotatorPointCloud(annot_list)
         reflection = np.asarray(
             [[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, -1, 0], [0, 0, 0, 1]]
@@ -105,27 +118,83 @@ def main(
         pcd_b = PcdBuilderPointCloud(
             camera, annot, reflection
         )  # reflection is needed due to dataset (icl nuim) particularities
-
-        for i, file in enumerate(annot_list):
-            pcds.append(pcd_b.build_pcd(main_data_list[i], i))
-
         associator = AssociatorFront()
+    else:
+        main_data_list = create_data_list_kitti(main_data_path)
+        annot_list = create_data_list_kitti(annot_path)
+        annot = AnnotatorPointCloud(annot_list)
+        pcd_b = PcdBuilderKitti(camera, annot, None)
+        associator = AssociatorAnnotNpy()
+
+    total_frames = len(main_data_list)
+
+    # TODO: 0,323 living
+    # TODO: 1203,1285 living
+    # TODO: 1300,1508 living
+
+
+    # in not normalized format (0-255 for RGB)
+    ignore_color_strs = [
+        # # Associator.make_string_from_array([156, 244, 150]),  # подушка-сидушка левая  --- не влияет на первом интервале (380 -- 500)
+        # # Associator.make_string_from_array([152, 254, 122]),  # подушка-сидушка правая  --- не влияет на первом интервале (380 -- 500)
+        # # Associator.make_string_from_array([197,  94, 189]),  # левый подлокотник --- не влияет на первом интервале (380 -- 500)
+        # Associator.make_string_from_array([14, 252, 75]), # подушка-спинка левая --- там разрывы по глубине, потолок сьезжает ниже (380 -- 500)
+        # # Associator.make_string_from_array([119, 171, 27]),  # подушка-спинка правая --- не влияет на первом интервале (380 -- 500)
+        # Associator.make_string_from_array([245, 63, 8]),  # пол -- едет потолок по вертикали (380 -- 500)
+        # Associator.make_string_from_array([233, 2, 151]), # подушка-нижняя нижняя --- вообще стемная, цепляет немного загиб, поэтому едет потолок по вертикали (380 -- 500)
+        # Associator.make_string_from_array([226, 8, 140]),  # подушка-нижняя левая --- едет потолок по вертикали (380 -- 500)
+        # Associator.make_string_from_array([237, 154, 228]),  # подушка-нижняя правая --- едет потолок по вертикали (380 -- 500)
+        # # Associator.make_string_from_array([57, 181, 174]),  # тумба левая внутренность --- не влияет на первом интервале (380 -- 500)
+        # Associator.make_string_from_array([155, 121, 128]), # подлокотник вертикальная плоскость -- ломало левую стену по горизонту (380 -- 500)
+    ]
+
+    pcd_enough_planes_ids = []
+    if intervals_source_path is None or not os.path.exists(intervals_source_path):
+        for i, file in enumerate(main_data_list):
+            pcd = pcd_b.build_pcd(file, i)
+
+            pcd = SmallPlanesFilter.filter(pcd)
+            pcd = PlaneRemover.remove_by_colors(pcd, ignore_color_strs)
+
+            print("Frame: {}".format(i))
+            is_enough = EnoughPlanesDetector.has_enough_planes(pcd)
+            if is_enough:
+                pcd_enough_planes_ids.append(i)
+
+        enough_intervals = ids_list_to_intervals(pcd_enough_planes_ids)
+        dump_evaluation_intervals("intervals.csv", enough_intervals)
+    else:
+        enough_intervals = load_evaluation_intervals(intervals_source_path, total_frames)
+
+    for interval in enough_intervals:
+        pcds = []
+        for frame_id in range(interval[0], interval[1] + 1):
+            pcd = pcd_b.build_pcd(main_data_list[frame_id], frame_id)
+
+            pcd = SmallPlanesFilter.filter(pcd)
+            pcd = PlaneRemover.remove_by_colors(pcd, ignore_color_strs)
+
+            print("Frame: {}".format(frame_id))
+            pcds.append(pcd)
+
         associator.associate(pcds)
 
-    max_tracks = PostProcessing.post_process(pcds)
+        PlaneInfoPrinter.print_planes_info(pcds)
 
-    slam_graph = SLAMGraph()
-    graph_estimated_state = slam_graph.estimate_graph(pcds, max_tracks)
+        # max_tracks = PostProcessing.post_process(pcds)
 
-    measure_error = MeasureError(ds_filename_gt, len(annot_list), num_of_nodes)
-    measure_error.measure_error(first_node, first_gt_node, graph_estimated_state)
+        slam_graph = SLAMGraph()
+        # graph_estimated_state = slam_graph.estimate_graph(pcds, max_tracks)
+        graph_estimated_state = slam_graph.estimate_graph(pcds)
 
-    visualisation = Visualisation(graph_estimated_state)
-    visualisation.visualize(pcds, graph_estimated_state)
+        # measure_error = MeasureError(ds_filename_gt, len(annot_list), num_of_nodes)
+        # measure_error.measure_error(first_node, first_gt_node, graph_estimated_state)
+        #
+        visualisation = Visualisation(graph_estimated_state)
+        visualisation.visualize(pcds, graph_estimated_state)
 
 
 if __name__ == "__main__":
-
     parser = argparse.ArgumentParser(
         description="Benchmarks a trajectory, built by an algorithm"
     )
@@ -136,18 +205,20 @@ if __name__ == "__main__":
         "annot", type=str, help="Directory where color images are stored"
     )
     parser.add_argument(
-        "which_format",
+        "--format",
         type=int,
-        choices=[1, 2, 3],
-        help="living room = 1, office = 2, point clouds = 3",
+        choices=[FORMAT_ICL_TUM, FORMAT_ICL, FORMAT_PCD, FORMAT_KITTI],
+        help="living room = 1, office = 2, point clouds = 3, kitti = 4",
     )
     parser.add_argument(
-        "first_node", type=int, help="From what node algorithm should start"
+        "--evaluate_intervals_source_path",
+        type=str,
+        default=None,
+        help="Path to csv with intervals of frames to evaluate on"
     )
     parser.add_argument(
         "first_gt_node", type=int, help="From what node gt references start"
     )
-    parser.add_argument("num_of_nodes", type=int, help="Number of needed nodes")
     parser.add_argument(
         "ds_filename_gt", type=str, help="Filename of a file with gt references"
     )
@@ -156,9 +227,8 @@ if __name__ == "__main__":
     main(
         args.main_data,
         args.annot,
-        args.which_format,
-        args.first_node,
+        args.format,
+        args.evaluate_intervals_source_path,
         args.first_gt_node,
-        args.num_of_nodes,
         args.ds_filename_gt,
     )

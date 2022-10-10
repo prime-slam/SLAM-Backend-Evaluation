@@ -1,3 +1,4 @@
+import os.path
 from typing import List
 from project.dto.Plane import Plane
 from project.annotators.Annotator import Annotator
@@ -11,8 +12,9 @@ class AnnotatorImage(Annotator):
     Extracts planes from annotation in rgb format
     """
 
-    def __init__(self, array_path_annot: List[str]):
+    def __init__(self, array_path_annot: List[str], array_path_depth: List[str]):
         super().__init__(array_path_annot)
+        self.depth_to_rgb = AnnotatorImage.__match_rgb_with_depth(array_path_annot, array_path_depth)
 
     def _get_planes(self, pcd, image_colors: str):
         planes_of_image = []
@@ -32,3 +34,38 @@ class AnnotatorImage(Annotator):
             planes_of_image.append((plane))
 
         return planes_of_image
+
+    def _get_annot_image_number_by_depth(self, depth_image_number: int):
+        return self.depth_to_rgb[depth_image_number]
+
+    @staticmethod
+    def __match_rgb_with_depth(rgb_filenames, depth_filenames) -> list:
+        rgb_filenames = list(map(lambda x: os.path.split(x)[-1], rgb_filenames))
+        depth_filenames = list(map(lambda x: os.path.split(x)[-1], depth_filenames))
+        depth_to_rgb_index = []
+        rgb_index = 0
+        depth_index = 0
+        prev_delta = float('inf')
+        while depth_index < len(depth_filenames) and rgb_index < len(rgb_filenames):
+            rgb_timestamp = float(rgb_filenames[rgb_index][:-4])
+            depth_timestamp = float(depth_filenames[depth_index][:-4])
+            delta = abs(depth_timestamp - rgb_timestamp)
+
+            if rgb_timestamp < depth_timestamp:
+                prev_delta = delta
+                rgb_index += 1
+                continue
+
+            if prev_delta < delta:
+                depth_to_rgb_index.append(rgb_index - 1)
+            else:
+                depth_to_rgb_index.append(rgb_index)
+
+            depth_index += 1
+
+        # Fix case when the last timestamp was for depth img
+        while depth_index < len(depth_filenames):
+            depth_to_rgb_index.append(rgb_index - 1)
+            depth_index += 1
+
+        return depth_to_rgb_index

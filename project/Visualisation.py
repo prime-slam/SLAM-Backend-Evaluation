@@ -4,13 +4,18 @@ from dto.Pcd import Pcd
 import numpy as np
 import open3d as o3d
 
+from project.utils.colors import denormalize_color
+
 
 class Visualisation:
     def __init__(self, graph_estimated_state):
         self.graph_estimated_state = graph_estimated_state
 
     @staticmethod
-    def visualize_pcd(pcd: Pcd, transforms: List = []):
+    def visualize_pcd(pcd: Pcd, transforms=None) -> o3d.geometry.PointCloud:
+        if transforms is None:
+            transforms = []
+
         pc = o3d.geometry.PointCloud()
         pc.points = o3d.utility.Vector3dVector(pcd.points)
 
@@ -46,4 +51,25 @@ class Visualisation:
             pc_answ += pc
         pc_answ = pc_answ.voxel_down_sample(0.05)
 
-        o3d.visualization.draw_geometries([pc_answ])
+        Visualisation.__draw_pcd(pc_answ)
+
+    @staticmethod
+    def __draw_pcd(pcd: o3d.geometry.PointCloud):
+        points = np.asarray(pcd.points)
+        colors = np.asarray(pcd.colors)
+
+        vis = o3d.visualization.VisualizerWithEditing()
+        vis.create_window()
+        vis.add_geometry(pcd)
+        vis.run()  # user picks points
+        vis.destroy_window()
+
+        picked_points = vis.get_picked_points()
+        for point in picked_points:
+            print(
+                "Pont with position {0} picked. Color: {1}".format(
+                    points[point],
+                    denormalize_color(colors[point])
+                )
+            )
+

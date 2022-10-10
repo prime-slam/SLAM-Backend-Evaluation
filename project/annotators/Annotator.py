@@ -22,12 +22,18 @@ class Annotator(ABC):
         """
         pass
 
-    def annotate(self, pcd, image_number: int):
+    def _get_annot_image_number_by_depth(self, depth_image_number: int):
+        return depth_image_number
+
+    def annotate(self, pcd, depth_image_number: int):
         """
         :param pcd: pcd to process
-        :param image_number: number of a current pcd in a file list
+        :param depth_image_number: number of a current pcd in a file list
         :return: pcd with filled field "planes"
         """
-        pcd.planes = self._get_planes(pcd, self.array_path_to_annot[image_number])
+        pcd.planes = self._get_planes(
+            pcd,
+            self.array_path_to_annot[self._get_annot_image_number_by_depth(depth_image_number)]
+        )
 
         return pcd

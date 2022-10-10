@@ -29,4 +29,4 @@ class PostProcessing:
         map_indx_to_max_num_points = sorted(
             indx_to_max_num_points, key=indx_to_max_num_points.get
         )
-        return map_indx_to_max_num_points[-config.MAX_PLANES_COUNT :]
+        return map_indx_to_max_num_points[-config.MAX_PLANES_COUNT:]

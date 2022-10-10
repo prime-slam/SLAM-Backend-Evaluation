@@ -18,7 +18,7 @@ class AnnotatorPointCloud(Annotator):
         equations = []
         annot_of_image = np.load(image_colors)
         annot_unique = np.unique(annot_of_image, axis=0)
-        unique_annot_without_black = list(filter(lambda x: (x != 1), annot_unique))
+        unique_annot_without_black = list(filter(lambda x: (x != 0), annot_unique))
 
         for i, annot_num in enumerate(unique_annot_without_black):
             indices = np.where(annot_of_image == annot_num)[0]
@@ -29,7 +29,7 @@ class AnnotatorPointCloud(Annotator):
             equations.append(equation)
 
             plane = Plane(
-                equation, track=-1, color=np.asarray([0, 0, 0]), indices=indices
+                equation, track=annot_num, color=None, indices=indices
             )
             planes.append(plane)
 
