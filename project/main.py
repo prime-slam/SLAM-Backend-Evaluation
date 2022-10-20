@@ -29,6 +29,7 @@ FORMAT_ICL_TUM = 1
 FORMAT_ICL = 2
 FORMAT_PCD = 3
 FORMAT_KITTI = 4
+FORMAT_CARLA = 5
 
 
 class TumFilenameComparator(str):
@@ -68,6 +69,14 @@ def create_main_lists_office(main_data_path: str):
     return png_files, depths_files
 
 
+def create_main_and_annot_list_carla(main_data_path: str):
+    files = os.listdir(main_data_path)
+    annot_list = list(map(lambda x: os.path.join(main_data_path, x), filter(lambda x: x.endswith(".npy"), files)))
+    main_data_list = list(map(lambda x: os.path.join(main_data_path, x), filter(lambda x: x.endswith(".pcd"), files)))
+
+    return annot_list, main_data_list
+
+
 def create_main_and_annot_list(main_data_path: str):
     annot_list = []
     main_data_list = []
@@ -103,10 +112,12 @@ def main(
         else:
             annot_list = create_annot_list_office(annot_path)
             png_list, main_data_list = create_main_lists_office(main_data_path)
-        annot = AnnotatorImage(annot_list, main_data_list)
+
         if input_format_code == FORMAT_ICL_TUM:
+            annot = AnnotatorImage(annot_list, main_data_list)
             pcd_b = PcdBuilderLiving(camera, annot)
         else:
+            annot = AnnotatorImage(annot_list, main_data_list, is_office=True)
             pcd_b = PcdBuilderOffice(camera, annot)
         associator = AssociatorAnnotImg()
     elif input_format_code == FORMAT_PCD:
@@ -119,6 +130,16 @@ def main(
             camera, annot, reflection
         )  # reflection is needed due to dataset (icl nuim) particularities
         associator = AssociatorFront()
+    elif input_format_code == FORMAT_CARLA:
+        annot_list, main_data_list = create_main_and_annot_list_carla(main_data_path)
+        annot = AnnotatorPointCloud(annot_list)
+        reflection = np.asarray(
+            [[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, -1, 0], [0, 0, 0, 1]]
+        )
+        pcd_b = PcdBuilderPointCloud(
+            camera, annot, reflection, scale=1
+        )  # reflection is needed due to dataset (icl nuim) particularities
+        associator = AssociatorAnnotNpy()
     else:
         main_data_list = create_data_list_kitti(main_data_path)
         annot_list = create_data_list_kitti(annot_path)
@@ -207,8 +228,8 @@ if __name__ == "__main__":
     parser.add_argument(
         "--format",
         type=int,
-        choices=[FORMAT_ICL_TUM, FORMAT_ICL, FORMAT_PCD, FORMAT_KITTI],
-        help="living room = 1, office = 2, point clouds = 3, kitti = 4",
+        choices=[FORMAT_ICL_TUM, FORMAT_ICL, FORMAT_PCD, FORMAT_KITTI, FORMAT_CARLA],
+        help="living room = 1, office = 2, point clouds = 3, kitti = 4, carla = 5",
     )
     parser.add_argument(
         "--evaluate_intervals_source_path",

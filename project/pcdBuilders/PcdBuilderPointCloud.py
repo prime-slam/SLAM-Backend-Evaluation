@@ -17,14 +17,16 @@ class PcdBuilderPointCloud(PcdBuilder):
         camera: Camera,
         annot: AnnotatorPointCloud,
         reflection=None,
+        scale=1000
     ):
         super().__init__(camera, annot)
         self.reflection = reflection
+        self.scale = scale
 
     def _get_points(self, depth_image_path):
         pc = o3d.io.read_point_cloud(depth_image_path)
         if self.reflection is not None:
             pc = pc.transform(self.reflection)
-        to_meters = 1000
+        to_meters = self.scale
 
         return Pcd(np.asarray(pc.points) / to_meters)
