@@ -6,7 +6,6 @@ from typing import List, Tuple
 import numpy as np
 
 from project import read_office, config
-from project.SLAMGraph import SLAMGraph
 from project.Visualisation import Visualisation
 from project.annotators.AnnotatorImage import AnnotatorImage
 from project.annotators.AnnotatorPointCloud import AnnotatorPointCloud
@@ -23,6 +22,8 @@ from project.postprocessing.EnoughPlanesDetector import EnoughPlanesDetector
 from project.postprocessing.PlaneInfoPrinter import PlaneInfoPrinter
 from project.postprocessing.PlaneRemover import PlaneRemover
 from project.postprocessing.SmallPlanesFilter import SmallPlanesFilter
+from project.slam.EigenPointsSLAMGraph import EigenPointsSLAMGraph
+from project.slam.LandmarksSLAMGraph import LandmarksSLAMGraph
 from project.utils.intervals import load_evaluation_intervals, dump_evaluation_intervals, ids_list_to_intervals
 
 FORMAT_ICL_TUM = 1
@@ -204,15 +205,19 @@ def main(
 
         # max_tracks = PostProcessing.post_process(pcds)
 
-        slam_graph = SLAMGraph()
+        slam_graph_old = LandmarksSLAMGraph()
+        # slam_graph = EigenPointsSLAMGraph()
         # graph_estimated_state = slam_graph.estimate_graph(pcds, max_tracks)
-        graph_estimated_state = slam_graph.estimate_graph(pcds)
+        graph_estimated_state_old = slam_graph_old.estimate_graph(pcds)
+        # graph_estimated_state = slam_graph.estimate_graph(pcds)
 
         # measure_error = MeasureError(ds_filename_gt, len(annot_list), num_of_nodes)
         # measure_error.measure_error(first_node, first_gt_node, graph_estimated_state)
         #
-        visualisation = Visualisation(graph_estimated_state)
-        visualisation.visualize(pcds, graph_estimated_state)
+        visualisation = Visualisation(graph_estimated_state_old)
+        visualisation.visualize(pcds, graph_estimated_state_old)
+        # visualisation = Visualisation(graph_estimated_state)
+        # visualisation.visualize(pcds, graph_estimated_state)
 
 
 if __name__ == "__main__":

@@ -41,13 +41,14 @@ class Visualisation:
         )
 
         pc_answ = o3d.geometry.PointCloud()
+        graph_estimated_state = graph_estimated_state[:len(pcd_s)]
         for i in range(num_of_nodes):
             pc = self.visualize_pcd(
                 pcd_s[-(i + 1)], [graph_estimated_state[-(i + 1)], reflection]
             )
             pc = pc.voxel_down_sample(0.05)
 
-            pcd_s[-(i + 1)].points = None
+            # pcd_s[-(i + 1)].points = None
             pc_answ += pc
         pc_answ = pc_answ.voxel_down_sample(0.05)
 
