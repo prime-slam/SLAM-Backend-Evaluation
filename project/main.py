@@ -205,19 +205,19 @@ def main(
 
         # max_tracks = PostProcessing.post_process(pcds)
 
-        slam_graph_old = LandmarksSLAMGraph()
-        # slam_graph = EigenPointsSLAMGraph()
+        slam_graph_landmarks = LandmarksSLAMGraph()
+        slam_graph = EigenPointsSLAMGraph()
         # graph_estimated_state = slam_graph.estimate_graph(pcds, max_tracks)
-        graph_estimated_state_old = slam_graph_old.estimate_graph(pcds)
-        # graph_estimated_state = slam_graph.estimate_graph(pcds)
+        graph_estimated_state_landmarks = slam_graph_landmarks.estimate_graph(pcds)
+        graph_estimated_state = slam_graph.estimate_graph(pcds, initial_poses=graph_estimated_state_landmarks)
 
         # measure_error = MeasureError(ds_filename_gt, len(annot_list), num_of_nodes)
         # measure_error.measure_error(first_node, first_gt_node, graph_estimated_state)
         #
-        visualisation = Visualisation(graph_estimated_state_old)
-        visualisation.visualize(pcds, graph_estimated_state_old)
-        # visualisation = Visualisation(graph_estimated_state)
-        # visualisation.visualize(pcds, graph_estimated_state)
+        # visualisation = Visualisation(graph_estimated_state_landmarks)
+        # visualisation.visualize(pcds, graph_estimated_state_landmarks)
+        visualisation = Visualisation(graph_estimated_state)
+        visualisation.visualize(pcds, graph_estimated_state)
 
 
 if __name__ == "__main__":

@@ -8,11 +8,11 @@ from project.slam.SLAMGraph import SLAMGraph
 
 
 class LandmarksSLAMGraph(SLAMGraph):
+    def _add_plane_node(self) -> int:
+        return self.graph.add_node_plane_4d(np.array([1, 0, 0, 0]))
 
     def _add_planes(self, pcd_s: List[Pcd], needed_indices: List[int]):
         w_z = np.identity(4)  # weight matrix
-        for _ in self.plane_index_to_real_index:
-            self.graph.add_node_plane_4d(np.array([1, 0, 0, 0]))
         for i, pcd in enumerate(pcd_s):
             for plane in pcd.planes:
                 if needed_indices is not None and plane.track not in needed_indices:
