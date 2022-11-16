@@ -17,7 +17,9 @@ class AssociatorAnnotNpy(Associator):
         for pcd in pcd_s:
             for plane in pcd.planes:
                 if plane.track not in self.__track_to_color:
-                    self.__track_to_color[plane.track] = color_to_string(get_random_color())
+                    self.__track_to_color[plane.track] = color_to_string(
+                        get_random_color()
+                    )
                 plane.color = color_from_string(self.__track_to_color[plane.track])
 
         return pcd_s

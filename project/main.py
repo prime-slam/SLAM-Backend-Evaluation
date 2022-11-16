@@ -25,7 +25,11 @@ from project.postprocessing.PlaneRemover import PlaneRemover
 from project.postprocessing.SmallPlanesFilter import SmallPlanesFilter
 from project.slam.EigenPointsSLAMGraph import EigenPointsSLAMGraph
 from project.slam.LandmarksSLAMGraph import LandmarksSLAMGraph
-from project.utils.intervals import load_evaluation_intervals, dump_evaluation_intervals, ids_list_to_intervals
+from project.utils.intervals import (
+    load_evaluation_intervals,
+    dump_evaluation_intervals,
+    ids_list_to_intervals,
+)
 from project.utils.quaternion import read_poses_csv
 
 FORMAT_ICL_TUM = 1
@@ -74,8 +78,18 @@ def create_main_lists_office(main_data_path: str):
 
 def create_main_and_annot_list_carla(main_data_path: str):
     files = os.listdir(main_data_path)
-    annot_list = list(map(lambda x: os.path.join(main_data_path, x), filter(lambda x: x.endswith(".npy"), files)))
-    main_data_list = list(map(lambda x: os.path.join(main_data_path, x), filter(lambda x: x.endswith(".pcd"), files)))
+    annot_list = list(
+        map(
+            lambda x: os.path.join(main_data_path, x),
+            filter(lambda x: x.endswith(".npy"), files),
+        )
+    )
+    main_data_list = list(
+        map(
+            lambda x: os.path.join(main_data_path, x),
+            filter(lambda x: x.endswith(".pcd"), files),
+        )
+    )
 
     return annot_list, main_data_list
 
@@ -156,7 +170,6 @@ def main(
     # TODO: 1203,1285 living
     # TODO: 1300,1508 living
 
-
     # in not normalized format (0-255 for RGB)
     ignore_color_strs = [
         # # Associator.make_string_from_array([156, 244, 150]),  # подушка-сидушка левая  --- не влияет на первом интервале (380 -- 500)
@@ -188,7 +201,9 @@ def main(
         enough_intervals = ids_list_to_intervals(pcd_enough_planes_ids)
         dump_evaluation_intervals("intervals.csv", enough_intervals)
     else:
-        enough_intervals = load_evaluation_intervals(intervals_source_path, total_frames)
+        enough_intervals = load_evaluation_intervals(
+            intervals_source_path, total_frames
+        )
 
     for interval in enough_intervals:
         pcds = []
@@ -225,7 +240,6 @@ def main(
         # graph_estimated_state = graph_estimated_state_landmarks
         graph_estimated_state = read_poses_csv("pose_result.csv")
 
-
         # measure_error = MeasureError(ds_filename_gt, len(annot_list), num_of_nodes)
         # measure_error.measure_error(first_node, first_gt_node, graph_estimated_state)
         #
@@ -255,7 +269,7 @@ if __name__ == "__main__":
         "--evaluate_intervals_source_path",
         type=str,
         default=None,
-        help="Path to csv with intervals of frames to evaluate on"
+        help="Path to csv with intervals of frames to evaluate on",
     )
     parser.add_argument(
         "first_gt_node", type=int, help="From what node gt references start"

@@ -28,9 +28,7 @@ class AnnotatorPointCloud(Annotator):
             equation = Plane.get_equation(plane_points)
             equations.append(equation)
 
-            plane = Plane(
-                equation, track=annot_num, color=None, indices=indices
-            )
+            plane = Plane(equation, track=annot_num, color=None, indices=indices)
             planes.append(plane)
 
         return planes

@@ -4,8 +4,8 @@ from typing import List, Tuple
 
 def load_evaluation_intervals(path: str, total_frames: int) -> List[Tuple[int, int]]:
     result = []
-    with open(path, 'r', newline='') as csvfile:
-        reader = csv.reader(csvfile, delimiter=',', quotechar='|')
+    with open(path, "r", newline="") as csvfile:
+        reader = csv.reader(csvfile, delimiter=",", quotechar="|")
         for row in reader:
             from_id, to_id = row[:2]
             result.append((int(from_id), int(to_id)))
@@ -14,12 +14,9 @@ def load_evaluation_intervals(path: str, total_frames: int) -> List[Tuple[int, i
 
 
 def dump_evaluation_intervals(path: str, intervals: List[Tuple[int, int]]):
-    with open(path, 'w', newline='') as csvfile:
+    with open(path, "w", newline="") as csvfile:
         writer = csv.writer(
-            csvfile,
-            delimiter=',',
-            quotechar='|',
-            quoting=csv.QUOTE_MINIMAL
+            csvfile, delimiter=",", quotechar="|", quoting=csv.QUOTE_MINIMAL
         )
         for interval in intervals:
             writer.writerow(interval)

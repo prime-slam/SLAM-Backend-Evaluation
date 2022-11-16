@@ -13,11 +13,7 @@ class PcdBuilderPointCloud(PcdBuilder):
     """
 
     def __init__(
-        self,
-        camera: Camera,
-        annot: AnnotatorPointCloud,
-        reflection=None,
-        scale=1000
+        self, camera: Camera, annot: AnnotatorPointCloud, reflection=None, scale=1000
     ):
         super().__init__(camera, annot)
         self.reflection = reflection

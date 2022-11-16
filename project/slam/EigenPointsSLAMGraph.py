@@ -6,7 +6,6 @@ from mrob.mrob import LM_ELLIPS
 
 
 class EigenPointsSLAMGraph(SLAMGraph):
-
     def _add_plane_node(self) -> int:
         return self.graph.add_eigen_factor_plane()
 
@@ -22,7 +21,7 @@ class EigenPointsSLAMGraph(SLAMGraph):
                     planeEigenId=cur_indx,
                     nodePoseId=self.graph_trajectory[i],
                     pointsArray=plane_points,
-                    W=1.0
+                    W=1.0,
                 )
 
     def _solve(self):
