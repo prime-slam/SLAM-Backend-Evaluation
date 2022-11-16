@@ -12,9 +12,16 @@ class AnnotatorImage(Annotator):
     Extracts planes from annotation in rgb format
     """
 
-    def __init__(self, array_path_annot: List[str], array_path_depth: List[str], is_office: bool = False):
+    def __init__(
+        self,
+        array_path_annot: List[str],
+        array_path_depth: List[str],
+        is_office: bool = False,
+    ):
         super().__init__(array_path_annot)
-        self.depth_to_rgb = AnnotatorImage.__match_rgb_with_depth(array_path_annot, array_path_depth, is_office)
+        self.depth_to_rgb = AnnotatorImage.__match_rgb_with_depth(
+            array_path_annot, array_path_depth, is_office
+        )
 
     def _get_planes(self, pcd, image_colors: str):
         planes_of_image = []
@@ -45,7 +52,7 @@ class AnnotatorImage(Annotator):
         depth_to_rgb_index = []
         rgb_index = 0
         depth_index = 0
-        prev_delta = float('inf')
+        prev_delta = float("inf")
         while depth_index < len(depth_filenames) and rgb_index < len(rgb_filenames):
             if is_office:
                 rgb_timestamp = float(rgb_filenames[rgb_index][-8:-4])

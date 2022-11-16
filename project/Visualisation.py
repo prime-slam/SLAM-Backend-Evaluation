@@ -41,7 +41,7 @@ class Visualisation:
         )
 
         pc_answ = o3d.geometry.PointCloud()
-        graph_estimated_state = graph_estimated_state[:len(pcd_s)]
+        graph_estimated_state = graph_estimated_state[: len(pcd_s)]
         for i in range(num_of_nodes):
             pc = self.visualize_pcd(
                 pcd_s[-(i + 1)], [graph_estimated_state[-(i + 1)], reflection]
@@ -69,8 +69,6 @@ class Visualisation:
         for point in picked_points:
             print(
                 "Pont with position {0} picked. Color: {1}".format(
-                    points[point],
-                    denormalize_color(colors[point])
+                    points[point], denormalize_color(colors[point])
                 )
             )
-

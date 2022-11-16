@@ -6,7 +6,7 @@ from scipy.spatial.transform import Rotation
 
 def read_poses_csv(path_to_file: str) -> List[np.array]:
     result = []
-    with open(path_to_file, 'r') as poses_file:
+    with open(path_to_file, "r") as poses_file:
         for line in poses_file:
             values = line.split(",")
             x, y, z = list(map(lambda x: float(x), values[:3]))

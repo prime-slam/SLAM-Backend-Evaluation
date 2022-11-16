@@ -12,6 +12,8 @@ class PlaneInfoPrinter:
             for plane in pcd.planes:
                 color_str = color_to_string(plane.color)
                 if color_str not in data:
-                    data[color_str] = "id: {0}, pts_cnt: {1}".format(plane.track, len(plane.plane_indices))
+                    data[color_str] = "id: {0}, pts_cnt: {1}".format(
+                        plane.track, len(plane.plane_indices)
+                    )
 
         print(data)
