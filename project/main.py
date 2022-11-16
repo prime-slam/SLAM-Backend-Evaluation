@@ -4,6 +4,7 @@ import os
 from typing import List, Tuple
 
 import numpy as np
+import open3d as o3d
 
 from project import read_office, config
 from project.Visualisation import Visualisation
@@ -25,6 +26,7 @@ from project.postprocessing.SmallPlanesFilter import SmallPlanesFilter
 from project.slam.EigenPointsSLAMGraph import EigenPointsSLAMGraph
 from project.slam.LandmarksSLAMGraph import LandmarksSLAMGraph
 from project.utils.intervals import load_evaluation_intervals, dump_evaluation_intervals, ids_list_to_intervals
+from project.utils.quaternion import read_poses_csv
 
 FORMAT_ICL_TUM = 1
 FORMAT_ICL = 2
@@ -209,7 +211,20 @@ def main(
         slam_graph = EigenPointsSLAMGraph()
         # graph_estimated_state = slam_graph.estimate_graph(pcds, max_tracks)
         graph_estimated_state_landmarks = slam_graph_landmarks.estimate_graph(pcds)
-        graph_estimated_state = slam_graph.estimate_graph(pcds, initial_poses=graph_estimated_state_landmarks)
+
+        # Prepare data for BALM
+        # tmp = np.concatenate(graph_estimated_state_landmarks[:interval[1] - interval[0] + 1])
+        # np.savetxt('alidarPose.csv', tmp, fmt='%.15f', delimiter=",")
+        # for i, pcd in enumerate(pcds):
+        #     pcd_o3d = o3d.geometry.PointCloud()
+        #     pcd_o3d.points = o3d.utility.Vector3dVector(pcd.points)
+        #     pcd_o3d = pcd_o3d.voxel_down_sample(0.05)
+        #     o3d.io.write_point_cloud("full{}.pcd".format(i), pcd_o3d)
+
+        # graph_estimated_state = slam_graph.estimate_graph(pcds, initial_poses=graph_estimated_state_landmarks)
+        # graph_estimated_state = graph_estimated_state_landmarks
+        graph_estimated_state = read_poses_csv("pose_result.csv")
+
 
         # measure_error = MeasureError(ds_filename_gt, len(annot_list), num_of_nodes)
         # measure_error.measure_error(first_node, first_gt_node, graph_estimated_state)

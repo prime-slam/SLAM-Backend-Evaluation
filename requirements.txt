@@ -4,3 +4,4 @@ open3d
 opencv-python~=4.6.0.66
 pre-commit
 pytest~=7.1.2
+scipy
